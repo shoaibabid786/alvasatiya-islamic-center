@@ -10,11 +10,10 @@ import {
   type LiveClass,
   type Assignment,
   type Quiz,
-  type PublicUser,
-  type Role,
   type User,
 } from "@/lib/academy-db";
 import { hashPassword, signPayment, toPublicUser, verifyPassword } from "@/lib/auth";
+import type { PublicUser, Role } from "@/lib/lms/types";
 
 function nowIso() {
   return new Date().toISOString();
