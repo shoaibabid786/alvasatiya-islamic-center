@@ -1,0 +1,31 @@
+export const SITE = {
+  name: "Alvasatiya Islamic Center",
+  shortName: "Alvasatiya",
+  domain: "alvasatiya.org",
+  url: "https://alvasatiya.org",
+  tagline: "Knowledge • Faith • Service",
+  description:
+    "Alvasatiya Islamic Center is an international Islamic organization dedicated to Quran learning, Islamic education, community welfare, and spreading beneficial knowledge.",
+  ayahArabic: "وَكَذَٰلِكَ جَعَلۡنَٰكُمۡ أُمَّةً وَسَطًا",
+  ayahEnglish: "And thus We have made you a justly balanced nation.",
+  ayahRef: "Al-Baqarah 2:143",
+  phone: "+92 300 4840308",
+  email: "alvasatiya4@gmail.com",
+  address: "24 KM Glaxo Town, Ferozpur Road, Lahore, Pakistan",
+  headquarters: "Jamia Umme Ashraf Jamal",
+  officeHours: "Sunday – Thursday, 9:00 AM – 5:00 PM (PKT)",
+  whatsapp: "923004840308",
+  founder: {
+    name: "Alhaj Mufti Imadullah Qadri Naeemi",
+    role: "Founder",
+    image: "/images/founder.png",
+  },
+  social: {
+    facebook: "https://www.facebook.com/Alvasatiya",
+    twitter: "https://x.com/alvasatiya4",
+    youtube: "",
+    instagram: "",
+    tiktok: "",
+  },
+  logo: "/images/logo.png",
+} as const;

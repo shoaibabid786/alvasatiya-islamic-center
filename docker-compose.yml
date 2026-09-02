@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: alvasatiya
+      POSTGRES_PASSWORD: alvasatiya
+      POSTGRES_DB: alvasatiya_lms
+    ports:
+      - "5432:5432"
+    volumes:
+      - alvasatiya_pg:/var/lib/postgresql/data
+
+volumes:
+  alvasatiya_pg:

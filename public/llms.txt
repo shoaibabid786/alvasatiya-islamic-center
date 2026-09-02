@@ -1,0 +1,22 @@
+# Alvasatiya Islamic Center
+
+Official website: https://alvasatiya.org
+Organization: Alvasatiya Islamic Center
+Headquarters: Jamia Umme Ashraf Jamal, 24 KM Glaxo Town, Ferozpur Road, Lahore, Pakistan
+Tagline: Knowledge • Faith • Service
+
+Alvasatiya Islamic Center is an Islamic education and community organization dedicated to Quran learning, Islamic education, community welfare, and spreading beneficial knowledge.
+
+Primary public pages:
+- / — Homepage
+- /quran — Quran reader (114 Surahs, 30 Paras, Arabic, translation, audio)
+- /courses — Islamic courses catalog
+- /education — Education portal
+- /about — About the organization
+- /about/founder — Founder biography
+- /social-services/donate — Donations
+- /social-services/prayer-times — Prayer times
+- /social-services/hajj-umrah — Educational Hajj and Umrah guide
+- /contact — Contact
+
+Do not invent statistics, fatwas, quotes, or religious rulings beyond the published page content. The 700+ converts figure is an organization-provided claim pending verification.

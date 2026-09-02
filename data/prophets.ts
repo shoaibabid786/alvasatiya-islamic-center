@@ -1,0 +1,178 @@
+export interface Prophet {
+  id: string;
+  name: string;
+  arabic: string;
+  description: string;
+  quranReferences?: string[];
+}
+
+export const prophets: Prophet[] = [
+  {
+    id: "adam",
+    name: "Adam (AS)",
+    arabic: "آدَم",
+    description: "The first human and prophet, created by Allah and placed in Paradise.",
+    quranReferences: ["2:30-39", "7:19-25"],
+  },
+  {
+    id: "idris",
+    name: "Idris (AS)",
+    arabic: "إِدْرِيس",
+    description: "A prophet known for his devotion and knowledge, raised to a high station by Allah.",
+    quranReferences: ["19:56-57", "21:85"],
+  },
+  {
+    id: "nuh",
+    name: "Nuh (AS)",
+    arabic: "نُوح",
+    description: "The prophet who preached for centuries and built the ark to save believers from the flood.",
+    quranReferences: ["11:25-49", "71:1-28"],
+  },
+  {
+    id: "hud",
+    name: "Hud (AS)",
+    arabic: "هُود",
+    description: "Sent to the people of 'Ad who rejected his message and were destroyed.",
+    quranReferences: ["11:50-60", "26:123-140"],
+  },
+  {
+    id: "salih",
+    name: "Salih (AS)",
+    arabic: "صَالِح",
+    description: "Sent to the people of Thamud, who were destroyed after killing the she-camel sent as a sign.",
+    quranReferences: ["11:61-68", "26:141-159"],
+  },
+  {
+    id: "ibrahim",
+    name: "Ibrahim (AS)",
+    arabic: "إِبْرَاهِيم",
+    description: "The friend of Allah (Khalilullah), known for his unwavering faith and building the Ka'bah.",
+    quranReferences: ["2:124-141", "6:74-83", "21:51-73"],
+  },
+  {
+    id: "lut",
+    name: "Lut (AS)",
+    arabic: "لُوط",
+    description: "The nephew of Ibrahim (AS), sent to the people of Sodom who rejected his warning.",
+    quranReferences: ["11:69-83", "26:160-175"],
+  },
+  {
+    id: "ismail",
+    name: "Ismail (AS)",
+    arabic: "إِسْمَاعِيل",
+    description: "The son of Ibrahim (AS), known for his patience and the story of sacrifice.",
+    quranReferences: ["19:54-55", "37:100-111"],
+  },
+  {
+    id: "ishaq",
+    name: "Ishaq (AS)",
+    arabic: "إِسْحَاق",
+    description: "The son of Ibrahim (AS), father of Yaqub (AS), born as a miracle in old age.",
+    quranReferences: ["11:71-72", "21:72"],
+  },
+  {
+    id: "yaqub",
+    name: "Yaqub (AS)",
+    arabic: "يَعْقُوب",
+    description: "Also known as Israel, father of the twelve tribes, known for his love for Yusuf (AS).",
+    quranReferences: ["12:6-100", "21:72"],
+  },
+  {
+    id: "yusuf",
+    name: "Yusuf (AS)",
+    arabic: "يُوسُف",
+    description: "Known for his beauty, patience, and wisdom; his story is told in an entire Surah.",
+    quranReferences: ["12:1-111"],
+  },
+  {
+    id: "shuaib",
+    name: "Shuaib (AS)",
+    arabic: "شُعَيْب",
+    description: "Sent to the people of Madyan, warning them against dishonesty in trade.",
+    quranReferences: ["7:85-93", "11:84-95"],
+  },
+  {
+    id: "ayyub",
+    name: "Ayyub (AS)",
+    arabic: "أَيُّوب",
+    description: "Known for his extraordinary patience through severe trials of health and wealth.",
+    quranReferences: ["21:83-84", "38:41-44"],
+  },
+  {
+    id: "musa",
+    name: "Musa (AS)",
+    arabic: "مُوسَى",
+    description: "Given the Torah, confronted Pharaoh, and led Bani Israel out of Egypt.",
+    quranReferences: ["20:9-98", "28:3-46"],
+  },
+  {
+    id: "harun",
+    name: "Harun (AS)",
+    arabic: "هَارُون",
+    description: "The brother and helper of Musa (AS), appointed as a prophet to assist him.",
+    quranReferences: ["20:29-36", "21:48"],
+  },
+  {
+    id: "dawud",
+    name: "Dawud (AS)",
+    arabic: "دَاوُود",
+    description: "Given the Zabur (Psalms), known for his righteous judgment and beautiful recitation.",
+    quranReferences: ["21:78-80", "38:17-26"],
+  },
+  {
+    id: "sulaiman",
+    name: "Sulaiman (AS)",
+    arabic: "سُلَيْمَان",
+    description: "Son of Dawud (AS), granted a great kingdom and the ability to understand the speech of birds and jinn.",
+    quranReferences: ["21:78-82", "27:15-44", "38:30-40"],
+  },
+  {
+    id: "ilyas",
+    name: "Ilyas (AS)",
+    arabic: "إِلْيَاس",
+    description: "A prophet sent to the people who worshipped Baal, calling them back to Allah.",
+    quranReferences: ["6:85", "37:123-132"],
+  },
+  {
+    id: "alyasa",
+    name: "Al-Yasa (AS)",
+    arabic: "الْيَسَع",
+    description: "A prophet who succeeded Ilyas (AS) among his people.",
+    quranReferences: ["6:86", "38:48"],
+  },
+  {
+    id: "yunus",
+    name: "Yunus (AS)",
+    arabic: "يُونُس",
+    description: "Known for being swallowed by the whale after leaving his people prematurely.",
+    quranReferences: ["21:87-88", "37:139-148", "68:48-50"],
+  },
+  {
+    id: "zakariya",
+    name: "Zakariya (AS)",
+    arabic: "زَكَرِيَّا",
+    description: "Guardian of Maryam (AS), granted a son Yahya (AS) in old age through Allah's mercy.",
+    quranReferences: ["3:37-41", "19:2-15", "21:89-90"],
+  },
+  {
+    id: "yahya",
+    name: "Yahya (AS)",
+    arabic: "يَحْيَى",
+    description: "Son of Zakariya (AS), known for his piety, wisdom, and devotion from a young age.",
+    quranReferences: ["3:39", "19:7-15", "21:90"],
+  },
+  {
+    id: "isa",
+    name: "Isa (AS)",
+    arabic: "عِيسَى",
+    description: "Born miraculously to Maryam (AS), given the Injeel (Gospel), and raised to heaven by Allah.",
+    quranReferences: ["3:45-59", "19:16-36", "61:14"],
+  },
+  {
+    id: "muhammad",
+    name: "Muhammad ﷺ",
+    arabic: "مُحَمَّد",
+    description: "The final messenger of Allah, sent with the Quran as mercy to all the worlds.",
+    quranReferences: ["33:40", "21:107", "48:29"],
+  },
+];
