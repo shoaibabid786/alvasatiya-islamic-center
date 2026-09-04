@@ -48,7 +48,6 @@ export default function WhatWeProvideSection({ showLearnMore = true }: { showLea
           })}
         </div>
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link href="/social-services/donate" className="btn btn-gold">Support Our Mission</Link>
           {showLearnMore && <Link href="/what-we-provide" className="btn btn-green">Learn More</Link>}
         </div>
       </div>

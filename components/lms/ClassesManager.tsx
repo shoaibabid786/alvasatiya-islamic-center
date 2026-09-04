@@ -8,13 +8,46 @@ import { Badge, ConfirmDialog, EmptyState, Field, LoadingState, Modal, statusTon
 type ClassRow = {
   id: string;
   name: string;
+  description?: string;
   subject: string;
   status: string;
   code: string;
   joinUrl: string;
-  teacher?: { name: string } | null;
+  teacherId?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  teacher?: { id: string; name: string; email?: string } | null;
   _count?: { members: number };
 };
+
+type ClassFormState = {
+  name: string;
+  description: string;
+  subject: string;
+  teacherId: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  studentIds: string[];
+};
+
+const emptyForm = (): ClassFormState => ({
+  name: "",
+  description: "",
+  subject: "",
+  teacherId: "",
+  startDate: "",
+  endDate: "",
+  status: "ACTIVE",
+  studentIds: [],
+});
+
+function toDateInput(value?: string | null) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
+}
 
 export default function ClassesManager({ role, base }: { role: "ADMIN" | "TEACHER" | "STUDENT"; base: string }) {
   const { push } = useToast();
@@ -23,14 +56,16 @@ export default function ClassesManager({ role, base }: { role: "ADMIN" | "TEACHE
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const [teachers, setTeachers] = useState<Array<{ id: string; name: string }>>([]);
-  const [students, setStudents] = useState<Array<{ id: string; name: string }>>([]);
-  const [form, setForm] = useState({ name: "", description: "", subject: "", teacherId: "", startDate: "", endDate: "", status: "ACTIVE", studentIds: [] as string[] });
+  const [editing, setEditing] = useState<ClassRow | null>(null);
+  const [teachers, setTeachers] = useState<Array<{ id: string; name: string; email?: string }>>([]);
+  const [students, setStudents] = useState<Array<{ id: string; name: string; email: string }>>([]);
+  const [form, setForm] = useState<ClassFormState>(emptyForm);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+  const [shifting, setShifting] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
-    const data = await api<{ classes: ClassRow[] }>(`/api/classes?q=${encodeURIComponent(q)}&status=${status}`);
+    const data = await api<{ classes: ClassRow[] }>(`/api/classes?q=${encodeURIComponent(q)}&status=${status}&pageSize=50`);
     setRows(data.classes);
     setLoading(false);
   }
@@ -41,20 +76,63 @@ export default function ClassesManager({ role, base }: { role: "ADMIN" | "TEACHE
 
   useEffect(() => {
     if (role !== "ADMIN") return;
-    api<{ teachers: Array<{ id: string; name: string }> }>("/api/classes?select=teachers").then((data) => setTeachers(data.teachers));
-    api<{ students: Array<{ id: string; name: string }> }>("/api/classes?select=students").then((data) => setStudents(data.students));
+    api<{ teachers: Array<{ id: string; name: string; email?: string }> }>("/api/classes?select=teachers").then((data) => setTeachers(data.teachers));
+    api<{ students: Array<{ id: string; name: string; email: string }> }>("/api/classes?select=students").then((data) => setStudents(data.students));
   }, [role]);
+
+  function openCreate() {
+    setEditing(null);
+    setForm(emptyForm());
+    setOpen(true);
+  }
+
+  function openEdit(row: ClassRow) {
+    setEditing(row);
+    setForm({
+      name: row.name,
+      description: row.description || "",
+      subject: row.subject,
+      teacherId: row.teacher?.id || row.teacherId || "",
+      startDate: toDateInput(row.startDate),
+      endDate: toDateInput(row.endDate),
+      status: row.status,
+      studentIds: [],
+    });
+    setOpen(true);
+  }
+
+  async function shiftTeacher(classId: string, teacherId: string) {
+    setShifting(classId);
+    try {
+      const result = await api<{ message: string }>(`/api/classes/${classId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ teacherId: teacherId || null }),
+      });
+      push(result.message);
+      await load();
+    } catch (err) {
+      push(err instanceof Error ? err.message : "Could not shift teacher", "error");
+    } finally {
+      setShifting(null);
+    }
+  }
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">{role === "STUDENT" ? "My Classes" : role === "TEACHER" ? "My Classes" : "Classes"}</h1>
-          <p className="text-sm text-slate-500">Search, filter, and manage class records.</p>
+          <p className="text-sm text-slate-500">
+            {role === "ADMIN"
+              ? "Create a class, choose its teacher, then edit or shift that teacher later."
+              : role === "TEACHER"
+                ? "Take the classes assigned to you. An administrator creates the class, students, and joining link."
+                : "Search, filter, and open your enrolled classes."}
+          </p>
         </div>
         {role === "ADMIN" ? (
-          <button className="lms-btn lms-btn-primary" onClick={() => setOpen(true)}>
-            Create class
+          <button className="lms-btn lms-btn-primary" onClick={openCreate}>
+            Make class
           </button>
         ) : null}
       </div>
@@ -70,7 +148,7 @@ export default function ClassesManager({ role, base }: { role: "ADMIN" | "TEACHE
       {loading ? (
         <LoadingState />
       ) : rows.length === 0 ? (
-        <EmptyState title="No classes found" body="Create a class or join with a class code." />
+        <EmptyState title="No classes found" body={role === "STUDENT" ? "You will see classes after an administrator enrolls you." : role === "TEACHER" ? "An administrator will assign you to a class." : "Create a class to get started."} />
       ) : (
         <div className="overflow-x-auto lms-card">
           <table className="w-full text-sm">
@@ -78,8 +156,8 @@ export default function ClassesManager({ role, base }: { role: "ADMIN" | "TEACHE
               <tr className="text-left text-slate-500">
                 <th className="px-4 py-3">Class</th>
                 <th>Subject</th>
-                <th>Teacher</th>
-                <th>Code</th>
+                <th>{role === "ADMIN" ? "Teacher" : "Teacher"}</th>
+                {role === "ADMIN" ? <th>Code</th> : null}
                 <th>Status</th>
                 <th></th>
               </tr>
@@ -94,26 +172,54 @@ export default function ClassesManager({ role, base }: { role: "ADMIN" | "TEACHE
                     <p className="text-xs text-slate-500">{row._count?.members || 0} students</p>
                   </td>
                   <td>{row.subject}</td>
-                  <td>{row.teacher?.name || "Unassigned"}</td>
-                  <td className="font-mono">{row.code}</td>
+                  <td>
+                    {role === "ADMIN" ? (
+                      <select
+                        className="min-w-[12rem]"
+                        disabled={shifting === row.id}
+                        value={row.teacher?.id || row.teacherId || ""}
+                        onChange={(e) => shiftTeacher(row.id, e.target.value)}
+                        aria-label={`Teacher for ${row.name}`}
+                      >
+                        <option value="">Unassigned</option>
+                        {teachers.map((teacher) => (
+                          <option key={teacher.id} value={teacher.id}>
+                            {teacher.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      row.teacher?.name || "Unassigned"
+                    )}
+                  </td>
+                  {role === "ADMIN" ? <td className="font-mono">{row.code}</td> : null}
                   <td>
                     <Badge tone={statusTone(row.status)}>{row.status}</Badge>
                   </td>
                   <td className="pr-4 text-right">
-                    <button
-                      className="text-teal-700 text-xs font-semibold"
-                      onClick={async () => {
-                        await navigator.clipboard.writeText(row.joinUrl);
-                        push("Joining link copied");
-                      }}
-                    >
-                      Copy link
-                    </button>
                     {role === "ADMIN" ? (
-                      <button className="ml-3 text-red-600 text-xs font-semibold" onClick={() => setPendingDelete(row.id)}>
-                        Delete
-                      </button>
-                    ) : null}
+                      <>
+                        <button className="text-teal-700 text-xs font-semibold" onClick={() => openEdit(row)}>
+                          Edit
+                        </button>
+                        <button
+                          className="ml-3 text-teal-700 text-xs font-semibold"
+                          onClick={async () => {
+                            await navigator.clipboard.writeText(row.joinUrl);
+                            push("Joining link copied");
+                          }}
+                        >
+                          Copy link
+                        </button>
+                        <button className="ml-3 text-red-600 text-xs font-semibold" onClick={() => setPendingDelete(row.id)}>
+                          Delete
+                        </button>
+                      </>
+                    ) : (
+                      <Link href={`${base}/classes/${row.id}`} className="text-teal-700 text-xs font-semibold">
+                        Open
+                      </Link>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -122,15 +228,24 @@ export default function ClassesManager({ role, base }: { role: "ADMIN" | "TEACHE
         </div>
       )}
 
-      <Modal open={open} title="Create class" onClose={() => setOpen(false)}>
+      <Modal open={open} title={editing ? "Edit class" : "Make class"} onClose={() => setOpen(false)}>
         <form
           className="grid gap-3"
           onSubmit={async (event) => {
             event.preventDefault();
             try {
-              const result = await api<{ message: string }>("/api/classes", { method: "POST", body: JSON.stringify(form) });
+              const path = editing ? `/api/classes/${editing.id}` : "/api/classes";
+              const result = await api<{ message: string }>(path, {
+                method: editing ? "PATCH" : "POST",
+                body: JSON.stringify({
+                  ...form,
+                  teacherId: form.teacherId || null,
+                  studentIds: editing ? undefined : form.studentIds,
+                }),
+              });
               push(result.message);
               setOpen(false);
+              setEditing(null);
               load();
             } catch (err) {
               push(err instanceof Error ? err.message : "Something went wrong", "error");
@@ -146,12 +261,12 @@ export default function ClassesManager({ role, base }: { role: "ADMIN" | "TEACHE
           <Field label="Description">
             <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </Field>
-          <Field label="Teacher">
+          <Field label="Teacher for this class">
             <select value={form.teacherId} onChange={(e) => setForm({ ...form, teacherId: e.target.value })}>
               <option value="">Unassigned</option>
               {teachers.map((teacher) => (
                 <option key={teacher.id} value={teacher.id}>
-                  {teacher.name}
+                  {teacher.name}{teacher.email ? ` · ${teacher.email}` : ""}
                 </option>
               ))}
             </select>
@@ -171,21 +286,26 @@ export default function ClassesManager({ role, base }: { role: "ADMIN" | "TEACHE
               <option>COMPLETED</option>
             </select>
           </Field>
-          <Field label="Add students">
-            <select
-              multiple
-              className="min-h-32"
-              value={form.studentIds}
-              onChange={(e) => setForm({ ...form, studentIds: [...e.target.selectedOptions].map((item) => item.value) })}
-            >
-              {students.map((student) => (
-                <option key={student.id} value={student.id}>
-                  {student.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <button className="lms-btn lms-btn-primary">Save class</button>
+          {!editing ? (
+            <Field label="Add students to this class">
+              <select
+                multiple
+                className="min-h-32"
+                value={form.studentIds}
+                onChange={(e) => setForm({ ...form, studentIds: [...e.target.selectedOptions].map((item) => item.value) })}
+              >
+                {students.map((student) => (
+                  <option key={student.id} value={student.id}>
+                    {student.name} ({student.email})
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs font-normal text-slate-500">Hold Ctrl or Cmd to select more than one student. You can also add students later from the class page.</p>
+            </Field>
+          ) : (
+            <p className="text-xs text-slate-500">Students stay on this class when you shift the teacher. Add or remove students from the class page.</p>
+          )}
+          <button className="lms-btn lms-btn-primary">{editing ? "Save changes" : "Save class"}</button>
         </form>
       </Modal>
 

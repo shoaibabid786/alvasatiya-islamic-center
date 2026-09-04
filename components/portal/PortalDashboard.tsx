@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { endClientSession } from "@/lib/lms/end-session";
+import PasswordInput from "@/components/PasswordInput";
 
 type Role = "ADMIN" | "TEACHER" | "STUDENT";
 type Snapshot = {
@@ -86,7 +88,7 @@ export default function PortalDashboard({ expected }: { expected: Role }) {
         </p>
         <div className="mt-6 flex gap-3">
           <Link href="/courses" className="btn btn-gold">Browse courses</Link>
-          <button className="btn btn-outline" onClick={() => fetch("/api/auth/logout", { method: "POST" }).then(() => router.push("/"))}>Sign out</button>
+          <button className="btn btn-outline" onClick={() => endClientSession("/login")}>Sign out</button>
         </div>
       </div>
     );
@@ -118,7 +120,7 @@ export default function PortalDashboard({ expected }: { expected: Role }) {
           </nav>
           <button
             className="btn btn-outline w-full mt-4 !py-2"
-            onClick={() => fetch("/api/auth/logout", { method: "POST" }).then(() => router.push("/"))}
+            onClick={() => endClientSession("/login")}
           >
             Sign out
           </button>
@@ -286,7 +288,7 @@ function AdminViews({ view, data, reload }: { view: string; data: Snapshot; relo
       </CardList>
     );
   }
-  return <SharedLearning view={view} data={data} reload={reload} asTeacher />;
+  return <SharedLearning view={view} data={data} reload={reload} asTeacher canScheduleClass />;
 }
 
 function TeacherViews({ view, data, reload }: { view: string; data: Snapshot; reload: () => Promise<void> }) {
@@ -474,11 +476,11 @@ function StudentViews({ view, data, reload }: { view: string; data: Snapshot; re
   return null;
 }
 
-function SharedLearning({ view, data, reload, asTeacher }: { view: string; data: Snapshot; reload: () => Promise<void>; asTeacher?: boolean }) {
+function SharedLearning({ view, data, reload, asTeacher, canScheduleClass }: { view: string; data: Snapshot; reload: () => Promise<void>; asTeacher?: boolean; canScheduleClass?: boolean }) {
   if (view === "Classes") {
     return (
       <div className="space-y-6">
-        {asTeacher && <ClassForm courses={data.courses} onDone={reload} />}
+        {canScheduleClass ? <ClassForm courses={data.courses} onDone={reload} /> : null}
         <CardList>
           {data.classes.map((item) => (
             <article key={item.id} className="card-surface p-4">
@@ -567,7 +569,7 @@ function TeacherCreate({ onDone }: { onDone: () => Promise<void> }) {
     >
       <input required placeholder="Teacher name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
       <input required type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-      <input required type="password" placeholder="Temporary password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+      <PasswordInput required placeholder="Temporary password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="new-password" />
       <button className="btn btn-gold">Create teacher</button>
     </form>
   );

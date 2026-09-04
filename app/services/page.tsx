@@ -27,7 +27,6 @@ const cards = [
   ["Institutions", "/institutions"],
   ["What We Provide", "/what-we-provide"],
   ["Feedback", "/feedback"],
-  ["Rohani Ilaj", "/departments/rohani-ilaj"],
 ];
 
 export default function Page() {

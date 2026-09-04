@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, useToast } from "@/components/lms/toast";
 import { Badge, ConfirmDialog, EmptyState, Field, LoadingState, Modal, statusTone } from "@/components/lms/ui";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function PeopleManager({ kind, base }: { kind: "teachers" | "students"; base: string }) {
   const { push } = useToast();
@@ -44,7 +45,13 @@ export default function PeopleManager({ kind, base }: { kind: "teachers" | "stud
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">{title}</h1>
-          <p className="text-sm text-slate-500">Search, add, edit, and activate accounts.</p>
+          <p className="text-sm text-slate-500">
+            {kind === "students"
+              ? base === "/admin"
+                ? "Only administrators can create student IDs. Students then log in with those credentials."
+                : "Students in your assigned classes. Only an administrator can create a student ID."
+              : "Only administrators can add teachers. Teachers cannot create their own accounts."}
+          </p>
         </div>
         {base === "/admin" ? (
           <button className="lms-btn lms-btn-primary" onClick={() => setOpen(true)}>
@@ -64,7 +71,7 @@ export default function PeopleManager({ kind, base }: { kind: "teachers" | "stud
       {loading ? (
         <LoadingState />
       ) : rows.length === 0 ? (
-        <EmptyState title={`No ${kind} found`} body="Try another search or create a new record." />
+        <EmptyState title={`No ${kind} found`} body={base === "/admin" ? "Try another search or create a new record." : "No students are assigned to your classes yet."} />
       ) : (
         <div className="lms-card overflow-x-auto">
           <table className="w-full text-sm">
@@ -141,7 +148,7 @@ export default function PeopleManager({ kind, base }: { kind: "teachers" | "stud
             <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </Field>
           <Field label="Password">
-            <input required type="password" minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+            <PasswordInput required minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="new-password" />
           </Field>
           {kind === "teachers" ? (
             <>

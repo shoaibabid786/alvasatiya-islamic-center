@@ -28,23 +28,8 @@ export function publicUserById(id: string) {
   return user ? toPublicUser(user) : null;
 }
 
-export function signupStudent(input: { name: string; email: string; password: string; phone?: string }) {
-  const db = getDb();
-  const email = input.email.trim().toLowerCase();
-  if (db.users.some((user) => user.email === email)) throw new Error("An account with this email already exists.");
-  const user: User = {
-    id: newId("user"),
-    name: input.name.trim(),
-    email,
-    phone: input.phone?.trim(),
-    passwordHash: hashPassword(input.password),
-    role: "STUDENT",
-    status: "pending",
-    createdAt: nowIso(),
-  };
-  db.users.push(user);
-  saveDb(db);
-  return toPublicUser(user);
+export function signupStudent(_input: { name: string; email: string; password: string; phone?: string }): never {
+  throw new Error("Students cannot register themselves. An administrator must create the account.");
 }
 
 export function loginWithPassword(email: string, password: string) {
@@ -194,6 +179,7 @@ export function assignTeacher(enrollmentId: string, teacherId: string) {
 }
 
 export function saveClass(teacher: PublicUser, input: Omit<LiveClass, "id" | "teacherId"> & { id?: string }) {
+  if (teacher.role !== "ADMIN") throw new Error("Only an administrator can create a class link.");
   const db = getDb();
   if (input.id) {
     const current = db.classes.find((item) => item.id === input.id);
@@ -322,7 +308,7 @@ export function addFeedback(fromUserId: string, message: string, courseSlug?: st
   return item;
 }
 
-export function saveAnnouncement(input: { title: string; body: string; audience: Role | "ALL" }) {
+export function saveAnnouncement(input: { title: string; body: string; audience: "ADMIN" | "TEACHER" | "STUDENT" | "ALL" }) {
   const db = getDb();
   const item = { id: newId("ann"), ...input, createdAt: nowIso() };
   db.announcements.unshift(item);

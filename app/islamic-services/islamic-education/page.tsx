@@ -18,7 +18,7 @@ const items = [
   ["Arabic", "/courses/arabic-language"],
   ["Islamic Studies", "/courses/islamic-studies"],
   ["Children's education", "/courses/childrens-islamic-education"],
-  ["Online education", "/departments/faizan-online-academy"],
+  ["Online education", "/departments/online-courses"],
 ];
 
 export default function Page() {

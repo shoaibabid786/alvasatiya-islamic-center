@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div className="lms-app grid min-h-screen place-items-center text-slate-500">Loading login...</div>}>
+    <Suspense fallback={<div className="py-16 text-center text-slate-500">Loading login...</div>}>
       <LmsLoginForm />
     </Suspense>
   );

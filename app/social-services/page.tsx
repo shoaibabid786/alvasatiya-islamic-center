@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PageHero from "@/components/layout/PageHero";
+import SuccessStoriesCarousel from "@/components/home/SuccessStoriesCarousel";
 import { NAV } from "@/data/navigation";
 import { pageMeta } from "@/lib/seo";
 
@@ -22,6 +23,7 @@ export default function Page() {
           </Link>
         ))}
       </section>
+      <SuccessStoriesCarousel showDonate />
     </>
   );
 }

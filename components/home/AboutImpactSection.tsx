@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { BookOpen, Globe, Handshake, HeartHandshake, Landmark, GraduationCap, Timer, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Globe, Handshake, HeartHandshake, Landmark, GraduationCap, Timer, Users } from "lucide-react";
 import { aboutIntro } from "@/data/about";
 import { courses } from "@/data/courses";
 import { departments } from "@/data/departments";
+import { SITE } from "@/data/site";
 
 const values = [
   { icon: HeartHandshake, title: "Peaceful", text: "Working for peace and serving humanity with dignity." },
@@ -12,59 +13,78 @@ const values = [
 ];
 
 const stats = [
-  { icon: Timer, value: "30+", label: "Years of Islamic Service", tone: "dark" as const },
-  { icon: Users, value: `${courses.length}+`, label: "Islamic Courses Offered", tone: "light" as const },
-  { icon: GraduationCap, value: `${departments.length}`, label: "Active Departments", tone: "light" as const },
-  { icon: Landmark, value: "114", label: "Surahs in the Quran Reader", tone: "dark" as const },
+  { icon: Timer, value: "30+", label: "Years of Islamic Service" },
+  { icon: Users, value: `${courses.length}+`, label: "Islamic Courses Offered" },
+  { icon: GraduationCap, value: `${departments.length}`, label: "Active Departments" },
+  { icon: Landmark, value: "114", label: "Surahs in the Quran Reader" },
 ];
 
 export default function AboutImpactSection() {
   return (
-    <section className="py-16 md:py-20 bg-white">
-      <div className="section-container grid lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-14 items-start">
-        <div>
-          <h2 className="text-2xl md:text-3xl font-bold tracking-wide uppercase text-green-deep">
-            About Alvasatiya — An Islamic Organization
-          </h2>
-          <div className="mt-3 mb-6 h-px w-40 bg-gold relative">
-            <span className="absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 rotate-45 bg-gold" />
-          </div>
-          <blockquote className="border-l-2 border-gold pl-4 italic text-muted">
-            {aboutIntro.paragraphs[0]}
-          </blockquote>
-          <div className="mt-8 grid sm:grid-cols-2 gap-6">
-            {values.map((item) => (
-              <article key={item.title} className="flex gap-3">
-                <div className="shrink-0 w-11 h-11 rounded-full bg-sage text-green-deep grid place-items-center">
-                  <item.icon className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-green-deep">{item.title}</h3>
-                  <p className="mt-1 text-sm text-muted">{item.text}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-          <Link href="/about/introduction" className="btn btn-green mt-8">Read our introduction</Link>
-        </div>
+    <section className="relative overflow-hidden py-20 md:py-24 bg-ivory">
+      <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-gold/15 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-green-deep/10 blur-3xl" />
 
-        <div className="grid grid-cols-2 gap-4">
-          {stats.map((stat) => (
-            <article
-              key={stat.label}
-              className={`rounded-2xl p-5 min-h-[150px] flex flex-col justify-between ${
-                stat.tone === "dark"
-                  ? "bg-green-deep text-ivory islamic-pattern"
-                  : "bg-sage text-green-deep"
-              }`}
-            >
-              <stat.icon className={`w-7 h-7 ${stat.tone === "dark" ? "text-gold" : "text-teal"}`} />
-              <div>
-                <p className="text-3xl font-bold">{stat.value}</p>
-                <p className={`mt-1 text-sm ${stat.tone === "dark" ? "text-ivory/80" : "text-muted"}`}>{stat.label}</p>
-              </div>
-            </article>
-          ))}
+      <div className="section-container relative">
+        <div className="grid lg:grid-cols-[1.12fr_0.88fr] gap-6 lg:gap-8 items-stretch">
+          <div className="rounded-[2rem] bg-white/90 border border-gold/25 shadow-[var(--shadow-md)] backdrop-blur-sm p-7 sm:p-10 lg:p-12">
+            <p className="section-eyebrow">About Alvasatiya</p>
+            <h2 className="section-title max-w-xl">An Islamic organization on a justly balanced path</h2>
+            <div className="geometric-divider !mx-0" />
+            <p className="text-muted leading-relaxed">{aboutIntro.paragraphs[0]}</p>
+
+            <div className="mt-8 grid sm:grid-cols-2 gap-3">
+              {values.map((item) => (
+                <article
+                  key={item.title}
+                  className="group rounded-2xl border border-gold/20 bg-ivory/70 p-4 transition duration-300 hover:-translate-y-1 hover:border-gold hover:shadow-[var(--shadow-sm)]"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="shrink-0 grid place-items-center w-10 h-10 rounded-xl bg-green-deep text-gold-soft">
+                      <item.icon className="w-[18px] h-[18px]" />
+                    </span>
+                    <div>
+                      <h3 className="font-semibold text-green-deep">{item.title}</h3>
+                      <p className="mt-1 text-sm text-muted leading-snug">{item.text}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-9 flex flex-wrap items-center gap-3">
+              <Link href="/about/introduction" className="btn btn-gold">
+                Read our introduction
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link href="/about" className="btn btn-outline">
+                About the Center
+              </Link>
+            </div>
+          </div>
+
+          <aside className="relative overflow-hidden rounded-[2rem] bg-green-deep text-ivory islamic-pattern p-7 sm:p-9 flex flex-col">
+            <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent" />
+            <p className="text-gold-soft text-[0.7rem] font-semibold tracking-[0.22em] uppercase">Center at a glance</p>
+            <p className="font-arabic mt-4 text-2xl sm:text-3xl text-gold-soft leading-relaxed" dir="rtl" lang="ar">
+              {SITE.ayahArabic}
+            </p>
+            <p className="mt-2 text-sm text-ivory/70 italic">{SITE.ayahEnglish}</p>
+
+            <ul className="mt-8 flex-1 divide-y divide-gold/20">
+              {stats.map((stat) => (
+                <li key={stat.label} className="flex items-center gap-4 py-4 first:pt-0 last:pb-0">
+                  <span className="shrink-0 grid place-items-center w-11 h-11 rounded-full border border-gold/40 bg-ivory/5">
+                    <stat.icon className="w-5 h-5 text-gold" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-3xl sm:text-4xl font-bold tracking-tight text-ivory leading-none">{stat.value}</p>
+                    <p className="mt-1.5 text-sm text-ivory/75">{stat.label}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </aside>
         </div>
       </div>
     </section>

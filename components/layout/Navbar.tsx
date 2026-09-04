@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Heart, Menu, MessageSquare, X } from "lucide-react";
 import { NAV, type NavItem } from "@/data/navigation";
+import SiteAccountMenu from "@/components/layout/SiteAccountMenu";
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -81,9 +82,7 @@ export default function Navbar() {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
-            <Link href="/login" className="hidden sm:inline text-green-deep text-xs font-semibold px-2">
-              Login
-            </Link>
+            <SiteAccountMenu />
             <Link href="/social-services/donate" className="btn btn-ochre !py-2 !px-3 sm:!px-4">
               <Heart className="w-4 h-4" />
               <span>Donate</span>
@@ -139,9 +138,7 @@ export default function Navbar() {
                 )}
               </div>
             ))}
-            <Link href="/login" className="block py-3 font-semibold text-sm">
-              Login
-            </Link>
+            <SiteAccountMenu variant="mobile" />
           </div>
         </div>
       )}

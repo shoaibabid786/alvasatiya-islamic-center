@@ -1,7 +1,26 @@
+import { existsSync, readFileSync } from "fs";
+import path from "path";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { FirestoreStore } from "../lib/firestore/adapter";
 
-const prisma = new PrismaClient();
+function loadEnv(file: string) {
+  const full = path.join(process.cwd(), file);
+  if (!existsSync(full)) return;
+  for (const line of readFileSync(full, "utf8").split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const index = trimmed.indexOf("=");
+    if (index < 0) continue;
+    const key = trimmed.slice(0, index).trim();
+    const value = trimmed.slice(index + 1).trim().replace(/^['"]|['"]$/g, "");
+    if (!process.env[key]) process.env[key] = value;
+  }
+}
+
+loadEnv(".env.local");
+loadEnv(".env");
+
+const prisma = new FirestoreStore();
 
 function daysAgo(n: number) {
   const date = new Date();
@@ -15,6 +34,9 @@ function ymd(n: number) {
 }
 
 async function main() {
+  console.log("Seeding Firestore database (default) in project", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
+
+  await prisma.liveMeeting.deleteMany();
   await prisma.quizAnswer.deleteMany();
   await prisma.quizAttempt.deleteMany();
   await prisma.question.deleteMany();
@@ -28,6 +50,7 @@ async function main() {
   await prisma.class.deleteMany();
   await prisma.user.deleteMany();
   await prisma.setting.deleteMany();
+  prisma.invalidate();
 
   const password = (value: string) => bcrypt.hashSync(value, 10);
 
@@ -92,13 +115,14 @@ async function main() {
     },
   });
 
-  const moreStudents = await Promise.all(
-    [
-      ["Omar Siddiqui", "omar@example.com", "STU-100002"],
-      ["Aisha Karim", "aisha@example.com", "STU-100003"],
-      ["Zayd Hassan", "zayd@example.com", "STU-100004"],
-    ].map(([name, email, studentCode]) =>
-      prisma.user.create({
+  const moreStudents = [];
+  for (const [name, email, studentCode] of [
+    ["Omar Siddiqui", "omar@example.com", "STU-100002"],
+    ["Aisha Karim", "aisha@example.com", "STU-100003"],
+    ["Zayd Hassan", "zayd@example.com", "STU-100004"],
+  ] as const) {
+    moreStudents.push(
+      await prisma.user.create({
         data: {
           name,
           email,
@@ -108,8 +132,8 @@ async function main() {
           studentCode,
         },
       }),
-    ),
-  );
+    );
+  }
 
   const quranClass = await prisma.class.create({
     data: {
@@ -204,7 +228,7 @@ async function main() {
       submittedAt: new Date(),
       score: 10,
       answers: {
-        create: questions.map((question) => ({
+        create: questions.map((question: { id: string; correctAnswer: string }) => ({
           questionId: question.id,
           selected: question.correctAnswer,
         })),
@@ -266,7 +290,18 @@ async function main() {
     ],
   });
 
-  console.log("Seed complete.");
+  prisma.invalidate();
+  const [users, classes, quizzes, assignments, attendance, announcements] = await Promise.all([
+    prisma.user.count(),
+    prisma.class.count(),
+    prisma.quiz.count(),
+    prisma.assignment.count(),
+    prisma.attendance.count(),
+    prisma.announcement.count(),
+  ]);
+
+  console.log("Firestore seed complete. Live document counts:");
+  console.log({ users, classes, quizzes, assignments, attendance, announcements });
   console.log("Admin:    admin@example.com / Admin@2026!");
   console.log("Teacher:  teacher@example.com / Teacher@2026!");
   console.log("Student:  student@example.com / Student@2026!");
@@ -274,10 +309,10 @@ async function main() {
 }
 
 main()
+  .then(() => {
+    process.exit(0);
+  })
   .catch((error) => {
     console.error(error);
     process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
   });

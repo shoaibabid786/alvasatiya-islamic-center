@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api, useToast } from "@/components/lms/toast";
 import { Field, LoadingState } from "@/components/lms/ui";
+import PasswordInput from "@/components/PasswordInput";
 import type { PublicUser } from "@/lib/lms/types";
 
 export default function ProfileView() {
@@ -110,10 +111,10 @@ export default function ProfileView() {
       >
         <h2 className="text-xl font-semibold">Change password</h2>
         <Field label="Current password">
-          <input type="password" required value={passwords.currentPassword} onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })} />
+          <PasswordInput required value={passwords.currentPassword} onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })} autoComplete="current-password" />
         </Field>
         <Field label="New password">
-          <input type="password" required minLength={8} value={passwords.newPassword} onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })} />
+          <PasswordInput required minLength={8} value={passwords.newPassword} onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })} autoComplete="new-password" />
         </Field>
         <button className="lms-btn lms-btn-primary">Update password</button>
       </form>

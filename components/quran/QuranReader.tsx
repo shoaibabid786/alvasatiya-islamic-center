@@ -5,7 +5,7 @@ import {
   Bookmark, BookmarkCheck, Copy, Minus, Moon, Pause, Play, Plus, Search, Share2, SkipBack, SkipForward, Sun,
 } from "lucide-react";
 import {
-  fetchSurah, fetchSurahList, getAudioUrl, searchQuran, RECITERS, TRANSLATIONS,
+  FALLBACK_SURAHS, fetchSurah, fetchSurahList, getAudioSources, searchQuran, RECITERS, TRANSLATIONS,
   type SurahDetail, type SurahMeta,
 } from "@/lib/quran";
 import { namesOfAllah } from "@/data/namesOfAllah";
@@ -14,7 +14,7 @@ import { prophets } from "@/data/prophets";
 const JUZ = Array.from({ length: 30 }, (_, i) => i + 1);
 
 export default function QuranReader() {
-  const [list, setList] = useState<SurahMeta[]>([]);
+  const [list, setList] = useState<SurahMeta[]>(FALLBACK_SURAHS);
   const [surah, setSurah] = useState(1);
   const [data, setData] = useState<SurahDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,7 +31,7 @@ export default function QuranReader() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    fetchSurahList().then(setList).catch(console.error);
+    fetchSurahList().then(setList).catch(() => setList(FALLBACK_SURAHS));
     const saved = localStorage.getItem("alvasatiya-quran");
     if (saved) {
       const p = JSON.parse(saved);
@@ -76,10 +76,22 @@ export default function QuranReader() {
 
   function playAyah(ayah: number) {
     audioRef.current?.pause();
-    const audio = new Audio(getAudioUrl(`${surah}:${ayah}`, reciter));
+    const sources = getAudioSources(surah, ayah, reciter);
+    const audio = new Audio();
+    let index = 0;
+    audio.src = sources[index];
     audioRef.current = audio;
     setPlaying(ayah);
-    audio.play();
+    audio.onerror = () => {
+      index += 1;
+      if (index < sources.length) {
+        audio.src = sources[index];
+        audio.play().catch(() => setPlaying(null));
+        return;
+      }
+      setPlaying(null);
+    };
+    audio.play().catch(() => setPlaying(null));
     audio.onended = () => {
       const next = ayah + 1;
       if (data && next <= data.ayahs.length) playAyah(next);

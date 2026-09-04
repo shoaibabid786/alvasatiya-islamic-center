@@ -66,7 +66,10 @@ export async function saveQuiz(user: PublicUser, body: unknown, id?: string) {
   if (id) {
     const current = await prisma.quiz.findUnique({ where: { id } });
     if (!current) throw new HttpError(404, "Quiz not found.");
-    if (user.role === "TEACHER" && current.teacherId !== user.id) throw new HttpError(403, "Unauthorized access");
+    if (user.role === "TEACHER") {
+      const classRow = await prisma.class.findUnique({ where: { id: current.classId } });
+      if (current.teacherId !== user.id && classRow?.teacherId !== user.id) throw new HttpError(403, "Unauthorized access");
+    }
     const updated = await prisma.quiz.update({
       where: { id },
       data: {

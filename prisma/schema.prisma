@@ -69,6 +69,23 @@ model Class {
   assignments   Assignment[]
   attendance    Attendance[]
   announcements Announcement[]
+  liveMeetings  LiveMeeting[]
+}
+
+model LiveMeeting {
+  id         String   @id @default(cuid())
+  classId    String
+  class      Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title      String
+  meetingUrl String
+  startsAt   DateTime
+  status     String   @default("SCHEDULED")
+  createdBy  String?
+  studentEmails String @default("[]")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([classId])
 }
 
 model ClassMember {

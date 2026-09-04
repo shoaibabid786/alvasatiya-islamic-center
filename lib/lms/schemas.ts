@@ -6,6 +6,11 @@ export const loginSchema = z.object({
   remember: z.boolean().optional(),
 });
 
+export const googleLoginSchema = z.object({
+  idToken: z.string().min(1, "Google sign-in is required"),
+  remember: z.boolean().optional(),
+});
+
 export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters")
@@ -67,6 +72,26 @@ export const classSchema = z.object({
 
 export const joinClassSchema = z.object({
   code: z.string().trim().min(4, "Class code is required"),
+});
+
+export const liveMeetingSchema = z.object({
+  classId: z.string().min(1, "Class is required"),
+  title: z.string().trim().min(2, "Title is required"),
+  meetingUrl: z
+    .string()
+    .trim()
+    .min(8, "Meeting link is required")
+    .refine((value) => {
+      try {
+        const url = new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }, "Enter a valid meeting link"),
+  startsAt: z.string().min(1, "Class time is required"),
+  status: z.enum(["SCHEDULED", "COMPLETED", "CANCELLED"]).optional(),
+  studentEmails: z.array(z.string().trim().email("Valid student email is required")).optional().default([]),
 });
 
 export const attendanceSaveSchema = z.object({

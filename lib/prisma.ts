@@ -1,11 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { FirestoreStore } from "@/lib/firestore/adapter";
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const globalForStore = globalThis as unknown as { prisma?: FirestoreStore };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
+export const prisma = globalForStore.prisma ?? new FirestoreStore();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") globalForStore.prisma = prisma;

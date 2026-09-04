@@ -1,6 +1,6 @@
-import Link from "next/link";
 import PageHero from "@/components/layout/PageHero";
 import JsonLd from "@/components/seo/JsonLd";
+import SuccessStoriesCarousel from "@/components/home/SuccessStoriesCarousel";
 import { welfarePrograms } from "@/data/welfare";
 import { achievementStats } from "@/data/about";
 import { pageMeta } from "@/lib/seo";
@@ -34,9 +34,7 @@ export default function Page() {
           </article>
         ))}
       </section>
-      <section className="section-container pb-12 text-center">
-        <Link href="/social-services/donate" className="btn btn-gold">Donate Now</Link>
-      </section>
+      <SuccessStoriesCarousel showDonate />
     </>
   );
 }

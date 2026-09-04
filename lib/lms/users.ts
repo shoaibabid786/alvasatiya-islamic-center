@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { hashPassword, toPublicUser, verifyPassword } from "@/lib/auth";
+import { hashPassword, randomToken, toPublicUser, verifyPassword } from "@/lib/auth";
 import { HttpError, generateStudentCode, type PublicUser, type Role } from "@/lib/lms/types";
+import { verifyGoogleIdToken } from "@/lib/lms/google-auth";
 import {
   changePasswordSchema,
   profileSchema,
@@ -62,6 +63,44 @@ export async function loginAccount(email: string, password: string) {
   if (user.status === "SUSPENDED") throw new HttpError(403, "This account is suspended. Please contact the office.");
   if (user.status === "INACTIVE") throw new HttpError(403, "This account is inactive.");
   return user;
+}
+
+export async function loginWithGoogle(idToken: string) {
+  const google = await verifyGoogleIdToken(idToken);
+  const existing = await prisma.user.findUnique({ where: { email: google.email } });
+  if (existing) {
+    if (existing.role === "STUDENT" || existing.role === "ADMIN" || existing.role === "TEACHER") {
+      throw new HttpError(
+        403,
+        existing.role === "STUDENT"
+          ? "Google sign-in does not register student accounts. Students sign in with email and password."
+          : "This email belongs to a staff account. Sign in with email and password.",
+      );
+    }
+    if (existing.status === "SUSPENDED") throw new HttpError(403, "This account is suspended. Please contact the office.");
+    if (existing.status === "INACTIVE") throw new HttpError(403, "This account is inactive.");
+    if (!existing.profilePicture && google.photoUrl) {
+      return prisma.user.update({
+        where: { id: existing.id },
+        data: {
+          name: existing.name || google.name,
+          profilePicture: google.photoUrl,
+        },
+      });
+    }
+    return existing;
+  }
+
+  return prisma.user.create({
+    data: {
+      name: google.name,
+      email: google.email,
+      passwordHash: hashPassword(randomToken()),
+      role: "USER",
+      status: "ACTIVE",
+      profilePicture: google.photoUrl,
+    },
+  });
 }
 
 export async function listUsers(role: Role, q = "", status = "", page = 1, pageSize = 10) {

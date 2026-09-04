@@ -6,8 +6,11 @@ export async function GET(request: Request) {
     const user = await requireApiUser();
     const { q, page, pageSize, status } = parseSearch(request.url);
     const url = new URL(request.url);
-    if (url.searchParams.get("select") === "teachers") return jsonOk({ teachers: await listTeachersForSelect() });
-    if (url.searchParams.get("select") === "students") return jsonOk({ students: await listStudentsForSelect() });
+    if (url.searchParams.get("select") === "teachers" || url.searchParams.get("select") === "students") {
+      await requireApiUser(["ADMIN"]);
+      if (url.searchParams.get("select") === "teachers") return jsonOk({ teachers: await listTeachersForSelect() });
+      return jsonOk({ students: await listStudentsForSelect() });
+    }
     return jsonOk(await listClasses(user, q, status, page, pageSize));
   } catch (error) {
     return jsonError(error);

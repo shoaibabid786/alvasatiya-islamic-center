@@ -63,7 +63,10 @@ export async function saveAssignment(user: PublicUser, body: unknown, id?: strin
   if (id) {
     const current = await prisma.assignment.findUnique({ where: { id } });
     if (!current) throw new HttpError(404, "Assignment not found.");
-    if (user.role === "TEACHER" && current.teacherId !== user.id) throw new HttpError(403, "Unauthorized access");
+    if (user.role === "TEACHER") {
+      const classRow = await prisma.class.findUnique({ where: { id: current.classId } });
+      if (current.teacherId !== user.id && classRow?.teacherId !== user.id) throw new HttpError(403, "Unauthorized access");
+    }
     const updated = await prisma.assignment.update({ where: { id }, data: payload });
     return { ...updated, message: "Assignment updated successfully" };
   }

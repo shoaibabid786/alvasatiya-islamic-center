@@ -1,5 +1,6 @@
 import Link from "next/link";
 import WhatWeProvideSection from "@/components/home/WhatWeProvideSection";
+import SuccessStoriesCarousel from "@/components/home/SuccessStoriesCarousel";
 import PageHero from "@/components/layout/PageHero";
 import { pageMeta } from "@/lib/seo";
 
@@ -23,6 +24,7 @@ export default function Page() {
         </p>
       </section>
       <WhatWeProvideSection showLearnMore={false} />
+      <SuccessStoriesCarousel showDonate />
       <section className="section-container pb-16 flex flex-wrap gap-3">
         <Link href="/institutions" className="btn btn-outline">Our institutions</Link>
         <Link href="/contact" className="btn btn-green">Ask about eligibility</Link>

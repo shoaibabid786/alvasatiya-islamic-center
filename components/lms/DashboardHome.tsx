@@ -56,7 +56,7 @@ export default function DashboardHome({ role, base }: { role: Role; base: string
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-slate-800">Dashboard</h1>
-        <p className="text-sm text-slate-500">Live statistics from the database.</p>
+        <p className="text-sm text-slate-500">Live statistics loaded from Cloud Firestore.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map(([label, value]) => (

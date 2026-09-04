@@ -44,7 +44,7 @@ export function Badge({ children, tone = "slate" }: { children: React.ReactNode;
 
 export function statusTone(status: string) {
   const value = status.toUpperCase();
-  if (["ACTIVE", "PUBLISHED", "PRESENT", "GRADED", "SUBMITTED"].includes(value)) return "green" as const;
+  if (["ACTIVE", "PUBLISHED", "PRESENT", "GRADED", "SUBMITTED", "SCHEDULED"].includes(value)) return "green" as const;
   if (["DRAFT", "LATE", "PENDING", "LEAVE"].includes(value)) return "amber" as const;
   if (["INACTIVE", "ABSENT", "SUSPENDED", "CLOSED"].includes(value)) return "red" as const;
   return "teal" as const;

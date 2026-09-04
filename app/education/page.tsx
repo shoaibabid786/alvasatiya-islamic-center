@@ -18,7 +18,7 @@ const items = [
   { title: "Arabic", href: "/courses/arabic-language" },
   { title: "Computer education", href: "/contact", text: "IT and computer skills training is offered as a community service. Details to be published." },
   { title: "Communication / speech skills", href: "/contact", text: "Educational support for clear, respectful speech. Program details to be announced." },
-  { title: "Online education", href: "/departments/faizan-online-academy" },
+  { title: "Online education", href: "/departments/online-courses" },
 ];
 
 export default function Page() {

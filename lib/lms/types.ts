@@ -78,7 +78,7 @@ export function assertAllowedFile(name: string, size: number) {
   if (size > MAX_UPLOAD_BYTES) throw new HttpError(400, "File too large");
 }
 
-export type Role = "ADMIN" | "TEACHER" | "STUDENT";
+export type Role = "ADMIN" | "TEACHER" | "STUDENT" | "USER";
 export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
 export type ClassStatus = "ACTIVE" | "INACTIVE" | "COMPLETED";
 export type AttendanceStatus = "PRESENT" | "ABSENT" | "LATE" | "LEAVE";
@@ -107,5 +107,6 @@ export type PublicUser = {
 export function dashboardPath(role: Role) {
   if (role === "ADMIN") return "/admin/dashboard";
   if (role === "TEACHER") return "/teacher/dashboard";
+  if (role === "USER") return "/";
   return "/student/dashboard";
 }

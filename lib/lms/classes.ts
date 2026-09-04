@@ -45,11 +45,11 @@ export async function listClasses(user: PublicUser, q = "", status = "", page = 
     total,
     page,
     pageSize,
-    classes: rows.map((row) => ({
+    classes: rows.map((row) => sanitizeClassJoin({
       ...row,
       joinUrl: classJoinUrl(row.code),
       teacher: row.teacher ? toPublicUser(row.teacher) : null,
-    })),
+    }, user)),
   };
 }
 
@@ -66,23 +66,44 @@ export async function getClass(user: PublicUser, id: string) {
     },
   });
   if (!row) throw new HttpError(404, "Class not found");
-  return {
+  return sanitizeClassJoin({
     ...row,
     joinUrl: classJoinUrl(row.code),
     teacher: row.teacher ? toPublicUser(row.teacher) : null,
     students: row.members.map((item) => toPublicUser(item.student)),
-  };
+  }, user);
+}
+
+function sanitizeClassJoin<T extends { code: string; joinUrl?: string }>(row: T, user: PublicUser) {
+  if (user.role === "ADMIN") return row;
+  return { ...row, code: "", joinUrl: "" };
+}
+
+async function resolveTeacherId(teacherId: string | null | undefined) {
+  const id = teacherId?.trim() || null;
+  if (!id) return null;
+  const teacher = await prisma.user.findUnique({ where: { id } });
+  if (!teacher || teacher.role !== "TEACHER") throw new HttpError(400, "Select a valid teacher.");
+  if (teacher.status !== "ACTIVE") throw new HttpError(400, "That teacher account is not active.");
+  return teacher.id;
+}
+
+async function transferClassWork(classId: string, teacherId: string | null) {
+  if (!teacherId) return;
+  await prisma.quiz.updateMany({ where: { classId }, data: { teacherId } });
+  await prisma.assignment.updateMany({ where: { classId }, data: { teacherId } });
 }
 
 export async function createClass(body: unknown) {
   const data = classSchema.parse(body);
+  const teacherId = await resolveTeacherId(data.teacherId);
   const code = await uniqueClassCode();
   const created = await prisma.class.create({
     data: {
       name: data.name,
       description: data.description || "",
       subject: data.subject,
-      teacherId: data.teacherId || null,
+      teacherId,
       startDate: data.startDate ? new Date(data.startDate) : null,
       endDate: data.endDate ? new Date(data.endDate) : null,
       status: data.status || "ACTIVE",
@@ -101,18 +122,21 @@ export async function updateClass(id: string, body: unknown) {
   const current = await prisma.class.findUnique({ where: { id } });
   if (!current) throw new HttpError(404, "Class not found");
   const data = classSchema.partial().parse(body);
+  const nextTeacherId = data.teacherId === undefined ? current.teacherId : await resolveTeacherId(data.teacherId);
+  const teacherChanged = nextTeacherId !== current.teacherId;
   const updated = await prisma.class.update({
     where: { id },
     data: {
       name: data.name ?? current.name,
       description: data.description ?? current.description,
       subject: data.subject ?? current.subject,
-      teacherId: data.teacherId === undefined ? current.teacherId : data.teacherId,
+      teacherId: nextTeacherId,
       startDate: data.startDate === undefined ? current.startDate : data.startDate ? new Date(data.startDate) : null,
       endDate: data.endDate === undefined ? current.endDate : data.endDate ? new Date(data.endDate) : null,
       status: data.status ?? current.status,
     },
   });
+  if (teacherChanged) await transferClassWork(id, nextTeacherId);
   if (data.studentIds) {
     await prisma.classMember.deleteMany({ where: { classId: id } });
     if (data.studentIds.length) {
@@ -121,7 +145,13 @@ export async function updateClass(id: string, body: unknown) {
       });
     }
   }
-  return { ...updated, joinUrl: classJoinUrl(updated.code), message: "Class updated successfully" };
+  return {
+    ...updated,
+    joinUrl: classJoinUrl(updated.code),
+    message: teacherChanged && Object.keys(data).every((key) => key === "teacherId")
+      ? "Teacher shifted for this class"
+      : "Class updated successfully",
+  };
 }
 
 export async function deleteClass(id: string) {

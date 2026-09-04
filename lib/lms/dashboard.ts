@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type { PublicUser } from "@/lib/auth";
 import { studentClassIds, teacherClassIds } from "@/lib/lms/http";
 import { averageAttendance, todayAttendanceRate } from "@/lib/lms/attendance";
+import { HttpError } from "@/lib/lms/types";
 
 function monthKey(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -18,6 +19,7 @@ function lastNDays(n: number) {
 }
 
 export async function dashboardFor(user: PublicUser) {
+  if (user.role === "USER") throw new HttpError(403, "Unauthorized access");
   if (user.role === "ADMIN") return adminDashboard();
   if (user.role === "TEACHER") return teacherDashboard(user);
   return studentDashboard(user);

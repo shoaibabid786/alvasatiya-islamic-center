@@ -14,9 +14,12 @@ function isLmsPath(pathname: string) {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/teacher") ||
     pathname.startsWith("/student") ||
-    pathname.startsWith("/join") ||
-    pathname === "/login"
+    pathname.startsWith("/join")
   );
+}
+
+function isAuthPage(pathname: string) {
+  return pathname === "/login" || pathname === "/signup" || pathname.startsWith("/forgot-password");
 }
 
 export default function SiteShell({ children }: { children: React.ReactNode }) {
@@ -31,11 +34,11 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       <SloganBar />
       <BrandBar />
       <Navbar />
-      <BreadcrumbBar />
+      {isAuthPage(pathname) ? null : <BreadcrumbBar />}
       <main id="main" className="flex-1">
         {children}
       </main>
-      <Footer />
+      {isAuthPage(pathname) ? null : <Footer />}
       <BackToTop />
     </div>
   );

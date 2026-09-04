@@ -1,7 +1,5 @@
 import { jsonError, jsonOk, requireApiUser } from "@/lib/lms/http";
 import { reportsFor } from "@/lib/lms/dashboard";
-import { prisma } from "@/lib/prisma";
-import { settingsSchema } from "@/lib/lms/schemas";
 
 export async function GET() {
   try {

@@ -13,7 +13,7 @@ export const SITE = {
   email: "alvasatiya4@gmail.com",
   address: "24 KM Glaxo Town, Ferozpur Road, Lahore, Pakistan",
   headquarters: "Jamia Umme Ashraf Jamal",
-  officeHours: "Sunday – Thursday, 9:00 AM – 5:00 PM (PKT)",
+  officeHours: "Open 24/7",
   whatsapp: "923004840308",
   founder: {
     name: "Alhaj Mufti Imadullah Qadri Naeemi",
@@ -21,10 +21,10 @@ export const SITE = {
     image: "/images/founder.png",
   },
   social: {
-    facebook: "https://www.facebook.com/Alvasatiya",
+    facebook: "https://www.facebook.com/Alvasatiya/",
     twitter: "https://x.com/alvasatiya4",
-    youtube: "",
-    instagram: "",
+    youtube: "https://www.youtube.com/@Alvasatiya11223",
+    instagram: "https://www.instagram.com/alvasatiya_islamic_center/",
     tiktok: "",
   },
   logo: "/images/logo.png",

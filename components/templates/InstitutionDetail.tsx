@@ -4,6 +4,7 @@ import { MapPin, Users } from "lucide-react";
 import type { Institution } from "@/data/institutions";
 import { formatStudentCount } from "@/data/institutions";
 import CountUp from "@/components/ui/CountUp";
+import SuccessStoriesCarousel from "@/components/home/SuccessStoriesCarousel";
 import { SITE } from "@/data/site";
 import { getTehfeezBranches } from "@/lib/institutions";
 
@@ -18,6 +19,7 @@ export default function InstitutionDetail({
   const mapQuery = institution.location.includes("to be published") ? SITE.address : institution.location;
 
   return (
+    <>
     <article>
       <div className="relative h-56 sm:h-72 md:h-96 overflow-hidden bg-green-deep islamic-pattern">
         <Image src={institution.image} alt={institution.title} fill className="object-cover" priority sizes="100vw" />
@@ -170,5 +172,7 @@ export default function InstitutionDetail({
         </aside>
       </div>
     </article>
+    <SuccessStoriesCarousel showDonate />
+    </>
   );
 }

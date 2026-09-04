@@ -32,13 +32,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(dashboardPath(session.role), request.url));
   }
 
-  if (pathname === "/login" && session) {
-    return NextResponse.redirect(new URL(dashboardPath(session.role), request.url));
+  if (pathname === "/signup") {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/teacher/:path*", "/student/:path*", "/portal/:path*", "/pay/:path*", "/join/:path*", "/login"],
+  matcher: ["/admin/:path*", "/teacher/:path*", "/student/:path*", "/portal/:path*", "/pay/:path*", "/join/:path*", "/login", "/signup"],
 };

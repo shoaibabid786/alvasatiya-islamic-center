@@ -44,8 +44,10 @@ export async function POST(request: Request) {
       if (action === "saveAnnouncement") return NextResponse.json(saveAnnouncement(body));
       if (action === "saveInstitution") return NextResponse.json(saveInstitutionOverride(body.institution));
     }
-    if (user.role === "ADMIN" || user.role === "TEACHER") {
+    if (user.role === "ADMIN") {
       if (action === "saveClass") return NextResponse.json(saveClass(user, body));
+    }
+    if (user.role === "ADMIN" || user.role === "TEACHER") {
       if (action === "saveAssignment") return NextResponse.json(saveAssignment(user, body));
       if (action === "gradeSubmission") return NextResponse.json(gradeSubmission(user, body.submissionId, body.grade, body.feedback));
       if (action === "saveQuiz") return NextResponse.json(saveQuiz(user, body));

@@ -18,15 +18,18 @@ import {
   FileBarChart,
   PlusCircle,
   Megaphone,
+  Video,
   X,
 } from "lucide-react";
 import { ToastProvider } from "@/components/lms/toast";
-import type { PublicUser, Role } from "@/lib/lms/types";
+import { endClientSession } from "@/lib/lms/end-session";
+import { dashboardPath, type PublicUser, type Role } from "@/lib/lms/types";
 
 const NAV: Record<Role, Array<{ href: string; label: string; icon: typeof LayoutDashboard }>> = {
   ADMIN: [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/classes", label: "Classes", icon: BookOpen },
+    { href: "/admin/schedule", label: "Schedule class", icon: Video },
     { href: "/admin/teachers", label: "Teachers", icon: GraduationCap },
     { href: "/admin/students", label: "Students", icon: Users },
     { href: "/admin/attendance", label: "Attendance", icon: CalendarCheck },
@@ -40,6 +43,7 @@ const NAV: Record<Role, Array<{ href: string; label: string; icon: typeof Layout
   TEACHER: [
     { href: "/teacher/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/teacher/classes", label: "My Classes", icon: BookOpen },
+    { href: "/teacher/live", label: "Take class", icon: Video },
     { href: "/teacher/students", label: "Students", icon: Users },
     { href: "/teacher/attendance", label: "Attendance", icon: CalendarCheck },
     { href: "/teacher/quizzes", label: "Quizzes", icon: ClipboardList },
@@ -59,6 +63,7 @@ const NAV: Record<Role, Array<{ href: string; label: string; icon: typeof Layout
     { href: "/student/announcements", label: "Announcements", icon: Bell },
     { href: "/student/profile", label: "Profile", icon: UserRound },
   ],
+  USER: [],
 };
 
 export default function DashboardShell({ role, children }: { role: Role; children: React.ReactNode }) {
@@ -66,6 +71,7 @@ export default function DashboardShell({ role, children }: { role: Role; childre
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<PublicUser | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -76,8 +82,7 @@ export default function DashboardShell({ role, children }: { role: Role; childre
           return;
         }
         if (data.user.role !== role) {
-          const path = data.user.role === "ADMIN" ? "/admin/dashboard" : data.user.role === "TEACHER" ? "/teacher/dashboard" : "/student/dashboard";
-          router.replace(path);
+          router.replace(dashboardPath(data.user.role));
           return;
         }
         setUser(data.user);
@@ -121,13 +126,15 @@ export default function DashboardShell({ role, children }: { role: Role; childre
             </nav>
             <button
               className="lms-btn lms-btn-ghost mt-6 w-full"
+              disabled={loggingOut}
               onClick={async () => {
-                await fetch("/api/auth/logout", { method: "POST" });
-                router.push("/login");
+                if (loggingOut) return;
+                setLoggingOut(true);
+                await endClientSession("/login");
               }}
             >
               <LogOut className="h-4 w-4" />
-              Logout
+              {loggingOut ? "Signing out..." : "Logout"}
             </button>
           </aside>
           <div className="min-w-0">

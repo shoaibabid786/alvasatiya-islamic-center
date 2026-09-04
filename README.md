@@ -16,15 +16,15 @@ npm install
 copy .env.example .env
 ```
 
-3. Create the database and demo data:
+3. Enable **Cloud Firestore** in the Firebase console for project `alvasatiya-islamic-center` (database ID: `(default)`). Publish `firestore.rules` if writes are denied.
+
+4. Seed real records into Firestore:
 
 ```bash
-npx prisma generate
-npx prisma db push
-npm run db:seed
+npm run firestore:seed
 ```
 
-4. Start the app:
+5. Start the app:
 
 ```bash
 npm run dev
@@ -58,21 +58,14 @@ Unauthorized role URLs are redirected to the user's own dashboard.
 
 ## Database
 
-The app uses **Prisma ORM**. Local development uses a SQLite file (`prisma/dev.db`) so the LMS runs without installing PostgreSQL. Data persists after restart.
+The LMS stores users, classes, scheduled live meetings, attendance, quizzes, assignments, and announcements in **Cloud Firestore**.
 
-`docker-compose.yml` is included for PostgreSQL:
+- Firebase project: `alvasatiya-islamic-center`
+- Firestore database: `(default)`
 
-```bash
-docker compose up -d
-```
+Collections: `users`, `sessions`, `classes`, `classMembers`, `liveMeetings`, `quizzes`, `questions`, `quizAttempts`, `quizAnswers`, `assignments`, `assignmentSubmissions`, `attendance`, `announcements`, `settings`.
 
-Then set:
-
-```
-DATABASE_URL="postgresql://alvasatiya:alvasatiya@localhost:5432/alvasatiya_lms"
-```
-
-and change `provider` in `prisma/schema.prisma` to `postgresql` before running `npx prisma db push`.
+Dashboards load live counts from those collections. Firebase Analytics is separate and only tracks page views.
 
 ## File uploads
 

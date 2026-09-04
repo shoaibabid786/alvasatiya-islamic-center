@@ -5,7 +5,7 @@ import { assertAllowedFile, fileExtension, HttpError } from "@/lib/lms/types";
 
 const UPLOAD_ROOT = path.join(process.cwd(), "uploads");
 
-export async function saveUpload(file: File, folder: "assignments" | "profiles" | "attachments") {
+export async function saveUpload(file: File, folder: "assignments" | "profiles" | "attachments" | "donations") {
   assertAllowedFile(file.name, file.size);
   const ext = fileExtension(file.name);
   const dir = path.join(UPLOAD_ROOT, folder);

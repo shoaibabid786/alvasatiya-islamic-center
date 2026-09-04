@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { BookOpen, GraduationCap, Laptop, Utensils } from "lucide-react";
 
 const CARDS = [
@@ -47,9 +46,6 @@ export default function SupportUsSection() {
             </article>
           ))}
         </div>
-        <Link href="/social-services/donate" className="btn btn-green mt-10 !px-10">
-          Donate Now
-        </Link>
       </div>
     </section>
   );

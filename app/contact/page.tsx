@@ -26,14 +26,15 @@ export default function Page() {
             <p className="text-muted mt-2">{SITE.phone}<br />{SITE.email}</p>
           </article>
           <article className="card-surface p-6">
-            <h2 className="font-semibold text-green-deep">Office hours</h2>
+            <h2 className="font-semibold text-green-deep">Hours</h2>
             <p className="text-muted mt-2">{SITE.officeHours}</p>
           </article>
           <article className="card-surface p-6">
             <h2 className="font-semibold text-green-deep">Social</h2>
             <p className="mt-2"><a className="text-green-deep underline" href={SITE.social.facebook}>Facebook</a></p>
             <p><a className="text-green-deep underline" href={SITE.social.twitter}>X / Twitter</a></p>
-            <p className="text-sm text-muted mt-2">YouTube, Instagram, and TikTok will appear when official URLs are provided.</p>
+            <p><a className="text-green-deep underline" href={SITE.social.youtube}>YouTube</a></p>
+            <p><a className="text-green-deep underline" href={SITE.social.instagram}>Instagram</a></p>
           </article>
         </div>
       </section>

@@ -13,6 +13,8 @@ import ServicesInstitutionsSection from "@/components/home/ServicesInstitutionsS
 import MissionCareSection from "@/components/home/MissionCareSection";
 import SupportUsSection from "@/components/home/SupportUsSection";
 import WhatWeProvideSection from "@/components/home/WhatWeProvideSection";
+import HomeStripBanner from "@/components/home/HomeStripBanner";
+import SuccessStoriesCarousel from "@/components/home/SuccessStoriesCarousel";
 
 export default function HomePage() {
   return (
@@ -22,14 +24,18 @@ export default function HomePage() {
       <ServiceCarousel />
       <QuranSection />
       <FounderSection />
+      <HomeStripBanner title="Come Closer to Allah" />
       <PillarsSection />
       <AboutImpactSection />
+      <HomeStripBanner title="Learn the Qur'an with Top Scholars" />
       <FeaturedCourses />
       <WhyChoose />
       <ThreeSteps />
       <InstitutionsSection />
       <ServicesInstitutionsSection />
       <MissionCareSection />
+      <HomeStripBanner title="Together, We Can Make a Difference" />
+      <SuccessStoriesCarousel showDonate />
       <SupportUsSection />
       <WhatWeProvideSection />
     </>

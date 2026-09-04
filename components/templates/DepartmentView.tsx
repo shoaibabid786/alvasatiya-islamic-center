@@ -13,40 +13,43 @@ export default function DepartmentView({ dept }: { dept: Department }) {
           <p>{dept.intro}</p>
           <h2>Purpose</h2>
           <p>{dept.purpose}</p>
-          <h2>Objectives</h2>
-          <ul>{dept.objectives.map((o) => <li key={o}>{o}</li>)}</ul>
-          <h2>Services</h2>
-          <ul>{dept.services.map((o) => <li key={o}>{o}</li>)}</ul>
-          <h2>Programs</h2>
-          <ul>{dept.programs.map((o) => <li key={o}>{o}</li>)}</ul>
-          <h2>Activities</h2>
-          <ul>{dept.activities.map((o) => <li key={o}>{o}</li>)}</ul>
-          {dept.notes && (
+          {dept.objectives.length ? (
             <>
-              <h2>Notes</h2>
-              <ul>{dept.notes.map((o) => <li key={o}>{o}</li>)}</ul>
+              <h2>Objectives</h2>
+              <ul>{dept.objectives.map((o) => <li key={o}>{o}</li>)}</ul>
             </>
-          )}
-          {dept.slug === "social-media" && (
+          ) : null}
+          {dept.services.length ? (
+            <>
+              <h2>Services</h2>
+              <ul>{dept.services.map((o) => <li key={o}>{o}</li>)}</ul>
+            </>
+          ) : null}
+          {dept.programs.length ? (
+            <>
+              <h2>Programs</h2>
+              <ul>{dept.programs.map((o) => <li key={o}>{o}</li>)}</ul>
+            </>
+          ) : null}
+          {dept.activities.length ? (
+            <>
+              <h2>Activities</h2>
+              <ul>{dept.activities.map((o) => <li key={o}>{o}</li>)}</ul>
+            </>
+          ) : null}
+          {dept.slug === "social-media" ? (
             <div className="card-surface p-6 mt-6">
               <h2 className="!mt-0">Official platforms</h2>
               <ul>
                 <li><a href={SITE.social.facebook}>Facebook</a></li>
+                <li><a href={SITE.social.youtube}>YouTube</a></li>
+                <li><a href={SITE.social.instagram}>Instagram</a></li>
                 <li><a href={SITE.social.twitter}>X / Twitter</a></li>
-                <li>YouTube — official URL to be added</li>
-                <li>Instagram — official URL to be added</li>
-                <li>TikTok — official URL to be added</li>
               </ul>
             </div>
-          )}
-          <div className="grid sm:grid-cols-2 gap-4 mt-8">
-            <article className="card-surface p-5"><h3 className="font-semibold">Gallery</h3><p className="text-sm text-muted mt-2">Official photos will appear here when provided.</p></article>
-            <article className="card-surface p-5"><h3 className="font-semibold">Videos / media</h3><p className="text-sm text-muted mt-2">Department media can be linked from the media library.</p></article>
-            <article className="card-surface p-5"><h3 className="font-semibold">Latest updates</h3><p className="text-sm text-muted mt-2">Updates will be published as they are confirmed.</p></article>
-            <article className="card-surface p-5"><h3 className="font-semibold">Events</h3><p className="text-sm text-muted mt-2">Related events are listed on the Islamic Events page.</p></article>
-          </div>
+          ) : null}
           <div className="mt-8 flex flex-wrap gap-3">
-            {dept.cta && <Link href={dept.cta.href} className="btn btn-gold">{dept.cta.label}</Link>}
+            {dept.cta ? <Link href={dept.cta.href} className="btn btn-gold">{dept.cta.label}</Link> : null}
             <Link href="/contact" className="btn btn-green">Contact</Link>
           </div>
         </div>
