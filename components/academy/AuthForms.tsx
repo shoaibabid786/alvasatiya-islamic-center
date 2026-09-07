@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import PasswordInput from "@/components/PasswordInput";
+import Logo from "@/components/ui/Logo";
 
 export function LoginForm() {
   const router = useRouter();
@@ -38,6 +39,9 @@ export function LoginForm() {
         router.refresh();
       }}
     >
+      <div className="mb-2 flex justify-center">
+        <Logo size={72} />
+      </div>
       <h1 className="text-2xl font-bold text-green-deep">{staff ? `${staff} Login` : "Login"}</h1>
       <p className="text-sm text-muted">
         {staff

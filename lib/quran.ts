@@ -29,6 +29,8 @@ export interface SurahDetail {
 
 export const RECITERS = [
   { id: "mishary", name: "Mishary Rashid Alafasy", identifier: "ar.alafasy", everyayah: "Alafasy_128kbps" },
+  { id: "basit", name: "Abdul Basit Abdus-Samad", identifier: "ar.abdulsamad", everyayah: "Abdul_Basit_Mujawwad_128kbps" },
+  { id: "basit-murattal", name: "Abdul Basit Abdus-Samad (Murattal)", identifier: "ar.abdulbasitmurattal", everyayah: "Abdul_Basit_Murattal_192kbps" },
   { id: "sudais", name: "Abdur-Rahman As-Sudais", identifier: "ar.abdurrahmaansudais", everyayah: "Abdurrahmaan_As-Sudais_192kbps" },
   { id: "husary", name: "Mahmoud Khalil Al-Husary", identifier: "ar.husary", everyayah: "Husary_128kbps" },
   { id: "minshawi", name: "Mohamed Siddiq Al-Minshawi", identifier: "ar.minshawi", everyayah: "Minshawy_Murattal_128kbps" },
@@ -65,7 +67,13 @@ export function getAudioSources(surah: number, ayah: number, reciterId: string) 
     `https://cdn.islamic.network/quran/audio/128/${reciter.identifier}/${global}.mp3`,
     `https://everyayah.com/data/${reciter.everyayah}/${pad}.mp3`,
   ];
-  if (reciter.identifier === "ar.abdurrahmaansudais") sources.reverse();
+  if (
+    reciter.identifier === "ar.abdurrahmaansudais" ||
+    reciter.identifier === "ar.abdulsamad" ||
+    reciter.identifier === "ar.abdulbasitmurattal"
+  ) {
+    sources.reverse();
+  }
   return sources;
 }
 

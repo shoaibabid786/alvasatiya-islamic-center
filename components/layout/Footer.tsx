@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { SITE } from "@/data/site";
+import Logo from "@/components/ui/Logo";
 
 const WEBSITE_LINKS = [
   { label: "Home", href: "/" },
@@ -36,9 +37,12 @@ export default function Footer() {
   return (
     <footer className="mt-auto bg-green-deep text-ivory islamic-pattern">
       <div className="section-container py-14">
-        <p className="mb-10 text-center text-2xl sm:text-3xl font-bold tracking-[0.12em] text-gold-soft uppercase">
+      <div className="mb-10 flex flex-col items-center text-center">
+        <Logo size={88} />
+        <p className="mt-4 text-2xl font-bold uppercase tracking-[0.12em] text-gold-soft sm:text-3xl">
           Alvasatiya Islamic Center
         </p>
+      </div>
 
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>

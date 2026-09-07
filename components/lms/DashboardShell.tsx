@@ -24,6 +24,7 @@ import {
 import { ToastProvider } from "@/components/lms/toast";
 import { endClientSession } from "@/lib/lms/end-session";
 import { dashboardPath, type PublicUser, type Role } from "@/lib/lms/types";
+import Logo from "@/components/ui/Logo";
 
 const NAV: Record<Role, Array<{ href: string; label: string; icon: typeof LayoutDashboard }>> = {
   ADMIN: [
@@ -97,10 +98,13 @@ export default function DashboardShell({ role, children }: { role: Role; childre
       <div className="lms-app">
         <div className="lg:grid lg:grid-cols-[260px_1fr] min-h-screen">
           <aside className={`fixed inset-y-0 left-0 z-40 w-[260px] bg-white border-r border-slate-200 p-4 transition-transform lg:static ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-teal-700">Alvasatiya LMS</p>
-                <p className="font-semibold text-slate-800">{title} Dashboard</p>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center gap-3">
+                <Logo size={40} href="/" />
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-teal-700">Alvasatiya LMS</p>
+                  <p className="font-semibold text-slate-800">{title} Dashboard</p>
+                </div>
               </div>
               <button className="lg:hidden lms-btn lms-btn-ghost !p-2" onClick={() => setOpen(false)}>
                 <X className="h-4 w-4" />

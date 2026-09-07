@@ -28,4 +28,5 @@ export const SITE = {
     tiktok: "",
   },
   logo: "/images/logo.png",
+  icon: "/favicon.ico",
 } as const;

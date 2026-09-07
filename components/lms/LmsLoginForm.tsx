@@ -7,6 +7,7 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { api } from "@/components/lms/toast";
 import { Field } from "@/components/lms/ui";
 import PasswordInput from "@/components/PasswordInput";
+import Logo from "@/components/ui/Logo";
 import { getFirebaseAuth } from "@/lib/firebase";
 
 function googleErrorMessage(error: unknown) {
@@ -106,8 +107,9 @@ export default function LmsLoginForm() {
             }
           }}
         >
-          <div>
-            <p className="text-xs uppercase tracking-[0.16em] text-teal-700">Alvasatiya</p>
+          <div className="flex flex-col items-center text-center">
+            <Logo size={72} />
+            <p className="mt-3 text-xs uppercase tracking-[0.16em] text-teal-700">Alvasatiya</p>
             <h2 className="mt-1 text-2xl font-semibold text-slate-800">Sign in</h2>
             <p className="mt-1 text-sm text-slate-500">
               Continue with Google to create a simple visitor account. This does not create a student or teacher account. Staff and students sign in with email and password.

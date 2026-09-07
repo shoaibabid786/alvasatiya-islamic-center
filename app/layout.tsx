@@ -32,8 +32,12 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   formatDetection: { telephone: true, email: true },
   icons: {
-    icon: SITE.logo,
+    icon: [
+      { url: SITE.icon, sizes: "48x48" },
+      { url: SITE.logo, type: "image/png" },
+    ],
     apple: SITE.logo,
+    shortcut: SITE.icon,
   },
   openGraph: {
     title: SITE.name,
