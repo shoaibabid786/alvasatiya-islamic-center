@@ -45,36 +45,57 @@ export default function ServicesInstitutionsSection() {
             const Icon = ICONS[index] ?? Landmark;
             const featured = index === 0;
             return (
-              <article
+              <Link
                 key={item.slug}
-                className={`rounded-2xl p-6 flex flex-col min-h-[220px] ${
-                  featured
-                    ? "bg-gradient-to-br from-[#e7efc4] via-[#d4e09b] to-ivory text-green-deep"
-                    : "bg-white/5 border border-white/10 text-ivory"
-                }`}
+                href={item.href}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 flex flex-col min-h-[220px] transition duration-300 ease-out hover:-translate-y-1 hover:border-transparent hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d4e09b] focus-visible:ring-offset-2 focus-visible:ring-offset-green-deep"
               >
-                <div
-                  className={`w-10 h-10 rounded-md grid place-items-center border ${
-                    featured ? "border-green-deep/20 text-green-deep" : "border-[#d4e09b]/40 text-[#d4e09b]"
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
+                <span
+                  aria-hidden
+                  className={`pointer-events-none absolute inset-0 z-0 bg-gradient-to-br from-[#e7efc4] via-[#d4e09b] to-ivory transition-opacity duration-300 ${
+                    featured ? "opacity-100" : "opacity-0"
+                  } group-hover:opacity-100 group-focus-visible:opacity-100`}
+                />
+                <div className="relative z-10 flex flex-col flex-1">
+                  <div
+                    className={`w-10 h-10 rounded-md grid place-items-center border transition-colors duration-300 ${
+                      featured
+                        ? "border-green-deep/20 text-green-deep"
+                        : "border-[#d4e09b]/40 text-[#d4e09b] group-hover:border-green-deep/20 group-hover:text-green-deep group-focus-visible:border-green-deep/20 group-focus-visible:text-green-deep"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3
+                    className={`mt-5 font-semibold text-lg transition-colors duration-300 ${
+                      featured
+                        ? "text-green-deep"
+                        : "text-ivory group-hover:text-green-deep group-focus-visible:text-green-deep"
+                    }`}
+                  >
+                    {item.title}
+                  </h3>
+                  <p
+                    className={`mt-2 text-sm flex-1 transition-colors duration-300 ${
+                      featured
+                        ? "text-green-deep/80"
+                        : "text-ivory/70 group-hover:text-green-deep/80 group-focus-visible:text-green-deep/80"
+                    }`}
+                  >
+                    {COPY[item.slug] ?? item.summary}
+                  </p>
+                  <span
+                    className={`mt-5 inline-flex items-center gap-1 text-sm font-semibold transition-colors duration-300 ${
+                      featured
+                        ? "text-green-deep"
+                        : "text-[#d4e09b] group-hover:text-green-deep group-focus-visible:text-green-deep"
+                    }`}
+                  >
+                    Learn More{" "}
+                    <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
                 </div>
-                <h3 className={`mt-5 font-semibold text-lg ${featured ? "text-green-deep" : "text-ivory"}`}>
-                  {item.title}
-                </h3>
-                <p className={`mt-2 text-sm flex-1 ${featured ? "text-green-deep/80" : "text-ivory/70"}`}>
-                  {COPY[item.slug] ?? item.summary}
-                </p>
-                <Link
-                  href={item.href}
-                  className={`mt-5 inline-flex items-center gap-1 text-sm font-semibold ${
-                    featured ? "text-green-deep" : "text-[#d4e09b]"
-                  }`}
-                >
-                  Learn More <ArrowRight className="w-4 h-4" />
-                </Link>
-              </article>
+              </Link>
             );
           })}
         </div>

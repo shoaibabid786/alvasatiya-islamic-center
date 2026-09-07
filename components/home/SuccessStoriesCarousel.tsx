@@ -69,7 +69,7 @@ export default function SuccessStoriesCarousel({ showDonate = false }: { showDon
 
           <button
             type="button"
-            className="absolute left-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-white/90 border border-border text-green-deep"
+            className="absolute left-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-white/90 text-green-deep transition duration-200 hover:border-gold hover:bg-[#e8efd0] hover:shadow-md"
             aria-label="Previous story"
             onClick={() => go(index - 1)}
           >
@@ -77,7 +77,7 @@ export default function SuccessStoriesCarousel({ showDonate = false }: { showDon
           </button>
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-white/90 border border-border text-green-deep"
+            className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-white/90 text-green-deep transition duration-200 hover:border-gold hover:bg-[#e8efd0] hover:shadow-md"
             aria-label="Next story"
             onClick={() => go(index + 1)}
           >
@@ -91,7 +91,7 @@ export default function SuccessStoriesCarousel({ showDonate = false }: { showDon
               key={item.title}
               type="button"
               aria-label={`Show ${item.title}`}
-              className={`h-1.5 rounded-full transition-all ${i === index ? "w-7 bg-green-deep" : "w-1.5 bg-border"}`}
+              className={`h-1.5 rounded-full transition-all duration-200 ${i === index ? "w-7 bg-green-deep" : "w-1.5 bg-border hover:bg-green-mid"}`}
               onClick={() => setIndex(i)}
             />
           ))}

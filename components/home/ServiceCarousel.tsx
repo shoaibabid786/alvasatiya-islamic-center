@@ -32,7 +32,7 @@ export default function ServiceCarousel() {
   return (
     <section className="bg-ivory border-b border-border" aria-label="Quick services">
       <div className="section-container py-5 relative">
-        <button type="button" className="absolute left-1 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-9 h-9 rounded-full bg-white border border-border text-green-deep shadow-sm" aria-label="Previous services" onClick={() => scroll(-1)}>
+        <button type="button" className="absolute left-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-white text-green-deep shadow-sm transition duration-200 hover:border-gold hover:bg-[#e8efd0] hover:shadow-md" aria-label="Previous services" onClick={() => scroll(-1)}>
           <ChevronLeft className="w-4 h-4" />
         </button>
         <div
@@ -51,7 +51,7 @@ export default function ServiceCarousel() {
             </Link>
           ))}
         </div>
-        <button type="button" className="absolute right-1 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-9 h-9 rounded-full bg-white border border-border text-green-deep shadow-sm" aria-label="Next services" onClick={() => scroll(1)}>
+        <button type="button" className="absolute right-1 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-white text-green-deep shadow-sm transition duration-200 hover:border-gold hover:bg-[#e8efd0] hover:shadow-md" aria-label="Next services" onClick={() => scroll(1)}>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>

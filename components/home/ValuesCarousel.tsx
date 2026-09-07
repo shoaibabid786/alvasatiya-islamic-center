@@ -53,7 +53,7 @@ export default function ValuesCarousel() {
       <div className="section-container py-3 md:py-4 relative">
         <button
           type="button"
-          className="absolute left-1 md:left-0 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-white border border-gold/40 text-green-deep shadow-[var(--shadow-sm)] hover:bg-gold"
+          className="absolute left-1 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full border border-gold/40 bg-white text-green-deep shadow-[var(--shadow-sm)] transition duration-200 hover:border-gold hover:bg-gold hover:shadow-md md:left-0 md:h-9 md:w-9"
           aria-label="Previous values"
           onClick={() => scroll(-1)}
         >
@@ -88,7 +88,7 @@ export default function ValuesCarousel() {
 
         <button
           type="button"
-          className="absolute right-1 md:right-0 top-1/2 -translate-y-1/2 z-10 grid place-items-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-white border border-gold/40 text-green-deep shadow-[var(--shadow-sm)] hover:bg-gold"
+          className="absolute right-1 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full border border-gold/40 bg-white text-green-deep shadow-[var(--shadow-sm)] transition duration-200 hover:border-gold hover:bg-gold hover:shadow-md md:right-0 md:h-9 md:w-9"
           aria-label="Next values"
           onClick={() => scroll(1)}
         >

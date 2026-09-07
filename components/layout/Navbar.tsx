@@ -43,7 +43,7 @@ function DesktopItem({ item, pathname }: { item: NavItem; pathname: string }) {
             <Link
               key={child.href}
               href={child.href}
-              className="block px-4 py-2.5 text-sm text-text hover:bg-sage hover:text-green-deep"
+              className="mx-1.5 block rounded-lg px-3 py-2.5 text-sm text-text transition-colors hover:bg-[#e8efd0] hover:text-green-deep"
               role="menuitem"
             >
               {child.label}
@@ -73,26 +73,32 @@ export default function Navbar() {
   }, [open]);
 
   return (
-    <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-y border-border shadow-sm">
+    <div className="sticky top-0 z-40 border-b border-black/[0.06] bg-white/90 shadow-[0_10px_30px_rgba(40,54,24,0.06)] backdrop-blur-xl">
       <div className="section-container">
-        <div className="flex items-center gap-1 min-h-14">
-          <nav className="hidden xl:flex items-center flex-1 min-w-0" aria-label="Main navigation">
+        <div className="flex min-h-[3.6rem] items-center gap-1">
+          <nav className="hidden min-w-0 flex-1 items-center xl:flex" aria-label="Main navigation">
             {NAV.map((item) => (
               <DesktopItem key={item.label} item={item} pathname={pathname} />
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
             <SiteAccountMenu />
-            <Link href="/social-services/donate" className="btn btn-ochre !py-2 !px-3 sm:!px-4">
-              <Heart className="w-4 h-4" />
+            <Link
+              href="/social-services/donate"
+              className="inline-flex items-center gap-1.5 rounded-full bg-ochre px-3.5 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-ivory shadow-[0_6px_16px_rgba(188,108,37,0.28)] transition duration-200 hover:-translate-y-0.5 hover:bg-[#a85d1e] sm:px-4"
+            >
+              <Heart className="h-3.5 w-3.5" />
               <span>Donate</span>
             </Link>
-            <Link href="/feedback" className="btn btn-ochre !py-2 !px-3 sm:!px-4">
-              <MessageSquare className="w-4 h-4" />
+            <Link
+              href="/feedback"
+              className="inline-flex items-center gap-1.5 rounded-full border border-ochre/35 bg-white px-3.5 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-ochre transition duration-200 hover:-translate-y-0.5 hover:border-ochre hover:bg-ochre hover:text-ivory sm:px-4"
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
               <span>Feedback</span>
             </Link>
             <button
-              className="xl:hidden p-2 text-green-deep"
+              className="rounded-full p-2 text-green-deep transition-colors hover:bg-[#e8efd0] xl:hidden"
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
@@ -104,27 +110,27 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div id="mobile-nav" className="xl:hidden bg-ivory text-text border-t border-border max-h-[80vh] overflow-y-auto">
+        <div id="mobile-nav" className="max-h-[80vh] overflow-y-auto border-t border-black/[0.06] bg-ivory text-text xl:hidden">
           <div className="section-container py-3">
             {NAV.map((item) => (
-              <div key={item.label} className="border-b border-border/70">
+              <div key={item.label} className="border-b border-black/[0.06]">
                 {item.children ? (
                   <>
                     <button
-                      className="w-full flex items-center justify-between py-3 font-semibold text-sm"
+                      className="flex w-full items-center justify-between py-3 text-sm font-semibold"
                       aria-expanded={section === item.label}
                       onClick={() => setSection((s) => (s === item.label ? null : item.label))}
                     >
                       {item.label}
-                      <ChevronDown className={`w-4 h-4 transition-transform ${section === item.label ? "rotate-180" : ""}`} />
+                      <ChevronDown className={`h-4 w-4 transition-transform ${section === item.label ? "rotate-180" : ""}`} />
                     </button>
                     {section === item.label && (
                       <div className="pb-3 pl-2">
-                        <Link href={item.href} className="block py-2 text-sm text-green-deep">
+                        <Link href={item.href} className="block rounded-lg py-2 text-sm text-green-deep">
                           View all
                         </Link>
                         {item.children.map((child) => (
-                          <Link key={child.href} href={child.href} className="block py-2 text-sm text-muted">
+                          <Link key={child.href} href={child.href} className="block rounded-lg py-2 text-sm text-muted hover:text-green-deep">
                             {child.label}
                           </Link>
                         ))}
@@ -132,7 +138,7 @@ export default function Navbar() {
                     )}
                   </>
                 ) : (
-                  <Link href={item.href} className="block py-3 font-semibold text-sm">
+                  <Link href={item.href} className="block py-3 text-sm font-semibold">
                     {item.label}
                   </Link>
                 )}

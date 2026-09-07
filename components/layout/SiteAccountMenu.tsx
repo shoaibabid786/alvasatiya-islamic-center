@@ -61,7 +61,10 @@ export default function SiteAccountMenu({ variant = "desktop" }: { variant?: "de
       );
     }
     return (
-      <Link href="/login" className="hidden sm:inline text-green-deep text-xs font-semibold px-2">
+      <Link
+        href="/login"
+        className="hidden rounded-full px-3 py-2 text-[0.72rem] font-semibold text-green-deep/80 transition-colors hover:bg-[#e8efd0] hover:text-green-deep sm:inline"
+      >
         Login
       </Link>
     );

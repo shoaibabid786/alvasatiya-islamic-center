@@ -89,7 +89,7 @@ export default function HeroSlider() {
 
       <button
         type="button"
-        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-gold/50 bg-green-deep/50 text-gold hover:bg-gold hover:text-green-deep"
+        className="absolute left-3 md:left-6 top-1/2 z-20 w-11 h-11 -translate-y-1/2 rounded-full border border-gold/50 bg-green-deep/50 text-gold transition duration-200 hover:border-gold hover:bg-gold hover:text-green-deep hover:shadow-md"
         aria-label="Previous slide"
         onClick={() => go(index - 1)}
       >
@@ -97,7 +97,7 @@ export default function HeroSlider() {
       </button>
       <button
         type="button"
-        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-gold/50 bg-green-deep/50 text-gold hover:bg-gold hover:text-green-deep"
+        className="absolute right-3 md:right-6 top-1/2 z-20 w-11 h-11 -translate-y-1/2 rounded-full border border-gold/50 bg-green-deep/50 text-gold transition duration-200 hover:border-gold hover:bg-gold hover:text-green-deep hover:shadow-md"
         aria-label="Next slide"
         onClick={() => go(index + 1)}
       >
@@ -112,7 +112,7 @@ export default function HeroSlider() {
             role="tab"
             aria-selected={i === index}
             aria-label={`Show slide ${i + 1}: ${slide.heading}`}
-            className={`h-2.5 rounded-full transition-all ${i === index ? "w-8 bg-gold" : "w-2.5 bg-ivory/50"}`}
+            className={`h-2.5 rounded-full transition-all duration-200 ${i === index ? "w-8 bg-gold" : "w-2.5 bg-ivory/50 hover:bg-ivory"}`}
             onClick={() => setIndex(i)}
           />
         ))}

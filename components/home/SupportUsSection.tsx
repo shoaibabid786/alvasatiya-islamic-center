@@ -37,12 +37,15 @@ export default function SupportUsSection() {
         </p>
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 text-center">
           {CARDS.map((item) => (
-            <article key={item.title} className="rounded-2xl border border-[#e5e7eb] bg-white p-7 shadow-sm">
-              <div className="mx-auto w-14 h-14 rounded-full bg-[#f3f4f6] text-green-deep grid place-items-center">
+            <article
+              key={item.title}
+              className="group rounded-2xl border border-[#e5e7eb] bg-white p-7 shadow-sm transition duration-300 ease-out hover:-translate-y-1.5 hover:border-[#d4e09b] hover:bg-gradient-to-br hover:from-[#e7efc4] hover:via-[#d4e09b] hover:to-ivory hover:shadow-[0_16px_40px_rgba(40,54,24,0.14)]"
+            >
+              <div className="mx-auto w-14 h-14 rounded-full bg-[#f3f4f6] text-green-deep grid place-items-center transition-colors duration-300 group-hover:bg-white/80 group-hover:text-green-deep">
                 <item.icon className="w-6 h-6" strokeWidth={1.6} />
               </div>
               <h3 className="mt-5 font-semibold text-green-deep">{item.title}</h3>
-              <p className="mt-2 text-sm text-muted">{item.text}</p>
+              <p className="mt-2 text-sm text-muted group-hover:text-green-deep/80 transition-colors duration-300">{item.text}</p>
             </article>
           ))}
         </div>
