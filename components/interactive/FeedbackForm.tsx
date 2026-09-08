@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import SuccessDialog from "@/components/ui/SuccessDialog";
-import { saveForm } from "@/lib/forms";
+import { submitInquiry } from "@/lib/forms";
 
 const CATEGORIES = [
   "Website",
@@ -18,6 +18,8 @@ const CATEGORIES = [
 export default function FeedbackForm() {
   const [form, setForm] = useState({ name: "", email: "", category: CATEGORIES[0], rating: 5, message: "" });
   const [success, setSuccess] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!success) return;
@@ -25,11 +27,19 @@ export default function FeedbackForm() {
     return () => clearTimeout(t);
   }, [success]);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    saveForm("feedback", form);
-    setSuccess(true);
-    setForm({ name: "", email: "", category: CATEGORIES[0], rating: 5, message: "" });
+    setSending(true);
+    setError("");
+    try {
+      await submitInquiry("feedback", form);
+      setSuccess(true);
+      setForm({ name: "", email: "", category: CATEGORIES[0], rating: 5, message: "" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not send your feedback.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -56,7 +66,8 @@ export default function FeedbackForm() {
         </div>
       </fieldset>
       <textarea required rows={6} placeholder="Feedback / Message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
-      <button className="btn btn-teal w-full">Submit Feedback</button>
+      {error ? <p className="text-sm text-red-700">{error}</p> : null}
+      <button className="btn btn-teal w-full" disabled={sending}>{sending ? "Sending..." : "Submit Feedback"}</button>
       <SuccessDialog
         open={success}
         onClose={() => setSuccess(false)}

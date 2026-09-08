@@ -3,17 +3,23 @@
 import { useMemo, useState } from "react";
 import SuccessDialog from "@/components/ui/SuccessDialog";
 import { events } from "@/data/events";
-import { saveForm } from "@/lib/forms";
+import { submitInquiry } from "@/lib/forms";
 
 export default function EventsClient() {
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
   const list = useMemo(() => events.filter((e) => e.status === tab), [tab]);
 
-  function register(title: string) {
-    saveForm("event", { title });
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 4000);
+  async function register(title: string) {
+    setError("");
+    try {
+      await submitInquiry("event", { title });
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 4000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not send your registration.");
+    }
   }
 
   return (
@@ -35,6 +41,7 @@ export default function EventsClient() {
           </article>
         ))}
       </div>
+      {error ? <p className="mt-4 text-sm text-red-700">{error}</p> : null}
       <div className="card-surface p-6 mt-10">
         <h2 className="font-semibold text-green-deep">Event calendar</h2>
         <ul className="mt-3 space-y-2 text-sm text-muted">

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MessageCircleQuestionMark, Search } from "lucide-react";
 import SuccessDialog from "@/components/ui/SuccessDialog";
 import { FATWA_CATEGORIES, fatwas } from "@/data/fatwas";
-import { saveForm } from "@/lib/forms";
+import { submitInquiry } from "@/lib/forms";
 
 export default function FatwaClient() {
   const [open, setOpen] = useState(false);
@@ -12,6 +12,8 @@ export default function FatwaClient() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [form, setForm] = useState({ name: "", email: "", category: "General", question: "" });
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!success) return;
@@ -27,13 +29,21 @@ export default function FatwaClient() {
     });
   }, [query, category]);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name || !form.email || !form.question) return;
-    saveForm("fatwa", form);
-    setOpen(false);
-    setSuccess(true);
-    setForm({ name: "", email: "", category: "General", question: "" });
+    setSending(true);
+    setError("");
+    try {
+      await submitInquiry("fatwa", form);
+      setOpen(false);
+      setSuccess(true);
+      setForm({ name: "", email: "", category: "General", question: "" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not send your question.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -56,7 +66,8 @@ export default function FatwaClient() {
               {FATWA_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </select>
             <textarea required rows={5} placeholder="Your Question" value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} />
-            <button className="btn btn-gold w-full">Submit Question</button>
+            {error ? <p className="text-sm text-red-700">{error}</p> : null}
+            <button className="btn btn-gold w-full" disabled={sending}>{sending ? "Sending..." : "Submit Question"}</button>
           </form>
         </div>
       )}

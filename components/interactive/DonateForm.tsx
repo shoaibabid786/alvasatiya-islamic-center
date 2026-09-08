@@ -64,6 +64,9 @@ export default function DonateForm() {
     try {
       const body = new FormData();
       body.append("file", slip);
+      body.append("category", category);
+      body.append("name", signedIn?.name || "");
+      body.append("email", signedIn?.email || "");
       const response = await fetch("/api/donate/slip", { method: "POST", body });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Could not upload the slip.");

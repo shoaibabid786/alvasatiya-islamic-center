@@ -23,7 +23,11 @@ export default function Page() {
           </article>
           <article className="card-surface p-6">
             <h2 className="font-semibold text-green-deep">Phone & email</h2>
-            <p className="text-muted mt-2">{SITE.phone}<br />{SITE.email}</p>
+            <p className="text-muted mt-2">
+              <a className="text-green-deep underline" href={`tel:${SITE.phone.replace(/\s/g, "")}`}>{SITE.phone}</a>
+              <br />
+              <a className="text-green-deep underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+            </p>
           </article>
           <article className="card-surface p-6">
             <h2 className="font-semibold text-green-deep">Hours</h2>

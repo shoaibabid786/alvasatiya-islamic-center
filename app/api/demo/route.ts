@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sendInquiryEmail } from "@/lib/inquiries";
 import { createDemo } from "@/lib/lms";
 
 export async function POST(request: Request) {
@@ -21,6 +22,11 @@ export async function POST(request: Request) {
       timeZone: String(body.timeZone).trim(),
       message: String(body.message || "").trim(),
     });
+    try {
+      await sendInquiryEmail("demo", body);
+    } catch {
+      /* Demo is stored even if inbox delivery is delayed. */
+    }
     return NextResponse.json({
       demo: { id: demo.id },
       message: "JazakAllahu Khairan! Your demo request has been submitted. Our team will contact you shortly.",
