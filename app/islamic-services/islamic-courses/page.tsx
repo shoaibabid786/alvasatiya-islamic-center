@@ -6,8 +6,8 @@ import { pageMeta } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata = pageMeta(
-  "Islamic Courses Hub | Quran, Tajweed, Hifz, Fiqh and Arabic Pathways",
-  "Explore Alvasatiya's Islamic learning pathways in Quran, Tajweed, Hifz, Fiqh, Hadith, Seerah, Arabic and children's education. This hub sits under Islamic Services; enrollment details are on each course page.",
+  "Islamic Courses Hub | Quran, Hadith, Fiqh, Usul and Fraiz",
+  "Explore Alvasatiya's Quran and Islamic sciences courses, including Ilm ul Hadees, Ilm ul Fiqh, Usul, and Ilm ul Fraiz.",
   "/islamic-services/islamic-courses"
 );
 

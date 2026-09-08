@@ -21,9 +21,9 @@ export default function FounderSection() {
           <p className="text-xl font-semibold text-green-deep">{founder.name}</p>
         </div>
         <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-10 items-start">
-          <div className="relative max-w-md mx-auto lg:mx-0">
+          <div className="relative w-full max-w-md mx-auto lg:mx-0">
             <div className="absolute -inset-3 border border-gold/50 rounded-[1.6rem]" />
-            <div className="relative aspect-[3/4] rounded-3xl overflow-hidden bg-green-deep border-4 border-gold/40">
+            <div className="relative w-full min-h-[22rem] aspect-[3/4] rounded-3xl overflow-hidden bg-green-deep border-4 border-gold/40">
               <FounderPhoto />
             </div>
           </div>

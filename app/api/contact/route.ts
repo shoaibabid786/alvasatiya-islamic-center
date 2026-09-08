@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { INQUIRY_TYPES, sendInquiryEmail, type InquiryType } from "@/lib/inquiries";
 
 const WINDOW_MS = 10 * 60 * 1000;
-const MAX_PER_WINDOW = 8;
+const MAX_PER_WINDOW = 20;
 const hits = new Map<string, number[]>();
 
 function clientIp(request: Request) {
@@ -31,15 +31,11 @@ export async function POST(request: Request) {
     if (!INQUIRY_TYPES.includes(type)) {
       return NextResponse.json({ error: "Unknown form type." }, { status: 400 });
     }
-    const result = await sendInquiryEmail(type, body, "prepare");
+    const result = await sendInquiryEmail(type, body);
     return NextResponse.json({
       ok: true,
       message: "JazakAllahu Khairan. Your message has been sent to Alvasatiya Islamic Center.",
       via: result.via,
-      inbox: result.inbox,
-      title: result.title,
-      fields: result.fields,
-      replyTo: result.replyTo,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not send your message.";

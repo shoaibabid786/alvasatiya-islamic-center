@@ -18,7 +18,7 @@ export const SITE = {
   founder: {
     name: "Alhaj Mufti Imadullah Qadri Naeemi",
     role: "Founder",
-    image: "/images/founder.png",
+    image: "/images/founder.jpg",
   },
   social: {
     facebook: "https://www.facebook.com/Alvasatiya/",

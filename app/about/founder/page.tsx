@@ -17,7 +17,7 @@ export default function Page() {
       <JsonLd data={personSchema()} />
       <PageHero eyebrow="About Us" title="Our Founder" description={founder.role} />
       <section className="section-container py-12 grid lg:grid-cols-[0.8fr_1.2fr] gap-10 items-start">
-        <div className="relative aspect-[3/4] rounded-3xl bg-green-deep overflow-hidden border-4 border-gold/40">
+        <div className="relative w-full min-h-[22rem] aspect-[3/4] rounded-3xl bg-green-deep overflow-hidden border-4 border-gold/40">
           <FounderPhoto />
         </div>
         <div className="prose-islamic">

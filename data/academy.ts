@@ -8,13 +8,13 @@ export const COURSE_SLIDER = [
 
 export const WHY_CHOOSE = [
   { title: "Flexible Timings", text: "Class times are arranged around the student's schedule after placement." },
-  { title: "25+ Islamic Courses", text: "Quran, Tajweed, Hifz, Hadith, Fiqh, Arabic, Seerah, and more." },
+  { title: "Quran and Islamic Sciences", text: "From Nazira and Dars e Nizami to Khatam e Nabuwat, Taharat, Hajj, Hadith, Fiqh, Usul, and Fraiz." },
   { title: "Qualified Teachers", text: "Teachers are created and approved by Admin before they teach." },
   { title: "One-to-One Learning", text: "Personal teacher attention is offered where the course allows it." },
   { title: "Free Demo", text: "Book a demo before you enroll. Our team confirms a suitable slot." },
   { title: "Certificates where applicable", text: "Certificates are issued only for courses that include them, after requirements are met." },
   { title: "Multilingual Support", text: "Pathways are offered in English, Urdu, and Arabic according to the course." },
-  { title: "Quran Learning for Children", text: "Short, gentle lessons with guardian involvement." },
+  { title: "Quran Learning for Children", text: "Nazira and Hifaz lessons with short, gentle practice and guardian involvement." },
   { title: "Anywhere, Any Device", text: "Join live classes from phone, tablet, or computer after enrollment is verified." },
   { title: "Group Classes where available", text: "Some courses also offer small groups when that format suits the student." },
 ] as const;

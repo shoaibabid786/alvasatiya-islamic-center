@@ -1,4 +1,4 @@
-import { inboxEmail, isMailConfigured, notifyInbox, type InquiryEmail } from "@/lib/mail";
+import { inboxEmail, notifyInbox, type InquiryEmail } from "@/lib/mail";
 
 export const INQUIRY_TYPES = ["contact", "feedback", "fatwa", "donate", "enroll", "event", "demo"] as const;
 export type InquiryType = (typeof INQUIRY_TYPES)[number];
@@ -98,19 +98,6 @@ export function buildInquiryEmail(type: InquiryType, payload: Record<string, unk
     fields[key] = text;
   }
 
-  fields["Complete details"] = [
-    `Name: ${show(name)}`,
-    `Email: ${show(email)}`,
-    `Phone Number: ${show(phone)}`,
-    subject ? `Subject: ${subject}` : "",
-    title ? `Event: ${title}` : "",
-    "",
-    "Message:",
-    message || "Not provided",
-  ]
-    .filter((line) => line !== "")
-    .join("\n");
-
   return {
     title: subject && type === "contact" ? `${SUBJECTS.contact}: ${subject}` : SUBJECTS[type],
     fields,
@@ -119,12 +106,9 @@ export function buildInquiryEmail(type: InquiryType, payload: Record<string, unk
   };
 }
 
-export async function sendInquiryEmail(type: InquiryType, payload: Record<string, unknown>, mode: "send" | "prepare" = "send") {
+export async function sendInquiryEmail(type: InquiryType, payload: Record<string, unknown>) {
   const email = buildInquiryEmail(type, payload);
   if (!email) return { via: "ignored" as const, title: "", fields: {}, inbox: inboxEmail() };
-  if (mode === "prepare" && !isMailConfigured()) {
-    return { ...email, via: "client" as const };
-  }
   await notifyInbox(email);
   return { ...email, via: "server" as const };
 }

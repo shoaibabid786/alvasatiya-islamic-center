@@ -8,8 +8,64 @@ export type InquiryEmail = {
   inbox: string;
 };
 
+const META_FIELDS = new Set(["Complete details", "Form type", "Received at"]);
+
+const FIELD_LABELS: Record<string, string> = {
+  Name: "name",
+  Email: "email",
+  "Phone Number": "phone",
+  Subject: "subject",
+  Message: "message",
+  Category: "category",
+  Event: "event",
+  Rating: "rating",
+  Course: "course",
+  Country: "country",
+  "Preferred date": "preferred date",
+  "Preferred time": "preferred time",
+  "Time zone": "time zone",
+  "Payment method": "payment method",
+  "Slip file": "slip file",
+};
+
+const FIELD_ORDER = [
+  "Name",
+  "Email",
+  "Phone Number",
+  "Subject",
+  "Category",
+  "Event",
+  "Rating",
+  "Course",
+  "Country",
+  "Preferred date",
+  "Preferred time",
+  "Time zone",
+  "Payment method",
+  "Slip file",
+  "Message",
+];
+
+function env(name: string) {
+  return (process.env[name] || "").trim();
+}
+
+function smtpUser() {
+  return env("SMTP_USER") || env("CONTACT_EMAIL");
+}
+
+function smtpPass() {
+  return env("SMTP_PASS");
+}
+
+function smtpHost() {
+  const host = env("SMTP_HOST");
+  if (!host || host.includes("@")) return "smtp.gmail.com";
+  return host;
+}
+
 function smtpConfigured() {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+  return Boolean(smtpUser() && smtpPass());
 }
 
 export function isMailConfigured() {
@@ -17,11 +73,11 @@ export function isMailConfigured() {
 }
 
 export function inboxEmail() {
-  return (process.env.CONTACT_EMAIL || SITE.email).trim();
+  return env("CONTACT_EMAIL") || SITE.email;
 }
 
 function fromAddress() {
-  return process.env.MAIL_FROM || process.env.SMTP_USER || `Alvasatiya Islamic Center <${inboxEmail()}>`;
+  return env("MAIL_FROM") || smtpUser() || `Alvasatiya Islamic Center <${inboxEmail()}>`;
 }
 
 function escapeHtml(value: string) {
@@ -32,6 +88,49 @@ function escapeHtml(value: string) {
     .replace(/"/g, "&quot;");
 }
 
+function isFilled(value: string) {
+  const text = value.trim();
+  return Boolean(text) && text !== "Not provided";
+}
+
+function fieldLabel(key: string) {
+  return FIELD_LABELS[key] || key.toLowerCase();
+}
+
+export function formatUserResponse(fields: Record<string, string>) {
+  const seen = new Set<string>();
+  const lines: string[] = [];
+
+  const add = (key: string) => {
+    if (seen.has(key) || META_FIELDS.has(key)) return;
+    const value = fields[key];
+    if (value === undefined || !isFilled(value)) return;
+    seen.add(key);
+    lines.push(`${fieldLabel(key)}: ${value.trim()}`);
+  };
+
+  for (const key of FIELD_ORDER) add(key);
+  for (const key of Object.keys(fields)) add(key);
+
+  return ["User response:", "", ...lines].join("\n");
+}
+
+function getTransporter() {
+  if (!smtpConfigured()) {
+    throw new Error("Email is not configured. Add SMTP_USER and SMTP_PASS (Gmail App Password) in .env, then restart npm run dev.");
+  }
+  const port = Number(env("SMTP_PORT") || 587);
+  return nodemailer.createTransport({
+    host: smtpHost(),
+    port,
+    secure: port === 465,
+    auth: {
+      user: smtpUser(),
+      pass: smtpPass(),
+    },
+  });
+}
+
 export async function sendMail(input: {
   to: string;
   subject: string;
@@ -39,79 +138,32 @@ export async function sendMail(input: {
   html?: string;
   replyTo?: string;
 }) {
-  if (!smtpConfigured()) {
-    throw new Error("Email is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS.");
+  const transporter = getTransporter();
+  try {
+    await transporter.sendMail({
+      from: fromAddress(),
+      to: input.to,
+      replyTo: input.replyTo,
+      subject: input.subject,
+      text: input.text,
+      html: input.html || input.text.replace(/\n/g, "<br/>"),
+    });
+  } catch (error) {
+    const raw = error instanceof Error ? error.message : "Could not send email.";
+    if (/invalid login|username and password|badcredentials|eauth/i.test(raw)) {
+      throw new Error("Gmail rejected the SMTP password. Put a 16-character App Password in SMTP_PASS (Google Account → App passwords), then restart npm run dev.");
+    }
+    throw new Error(raw);
   }
-  const port = Number(process.env.SMTP_PORT || 587);
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure: port === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-  await transporter.sendMail({
-    from: fromAddress(),
-    to: input.to,
-    replyTo: input.replyTo,
-    subject: input.subject,
-    text: input.text,
-    html: input.html || input.text.replace(/\n/g, "<br/>"),
-  });
 }
 
 export async function notifyInbox(input: InquiryEmail) {
   const to = input.inbox || inboxEmail();
-  const rows = Object.entries(input.fields);
-  const text = [`${input.title}`, "", ...rows.map(([label, value]) => `${label}:\n${value}\n`), `Inbox: ${to}`].join("\n");
+  const text = formatUserResponse(input.fields);
   const html = `
-    <div style="font-family:Georgia,serif;max-width:640px;color:#14532d">
-      <p style="margin:0 0 8px;letter-spacing:.12em;text-transform:uppercase;color:#b45309;font-size:12px">Alvasatiya Islamic Center</p>
-      <h2 style="margin:0 0 16px">${escapeHtml(input.title)}</h2>
-      <table style="width:100%;border-collapse:collapse">
-        ${rows
-          .map(
-            ([label, value]) =>
-              `<tr><td style="padding:8px 12px;border:1px solid #e5e7eb;width:170px;vertical-align:top;font-weight:600">${escapeHtml(label)}</td><td style="padding:8px 12px;border:1px solid #e5e7eb;white-space:pre-wrap">${escapeHtml(value)}</td></tr>`
-          )
-          .join("")}
-      </table>
-      <p style="margin-top:16px;color:#4b5563;font-size:13px">Reply to this email to answer the sender directly.</p>
+    <div style="font-family:Georgia,serif;font-size:16px;line-height:1.75;color:#111827;max-width:640px">
+      <p style="white-space:pre-wrap;margin:0">${escapeHtml(text)}</p>
     </div>
   `;
-
-  if (smtpConfigured()) {
-    await sendMail({ to, subject: input.title, text, html, replyTo: input.replyTo });
-    return;
-  }
-
-  await sendViaFormSubmit(to, input.title, input.fields, input.replyTo);
-}
-
-export async function sendViaFormSubmit(to: string, subject: string, fields: Record<string, string>, replyTo?: string) {
-  const origin = typeof window === "undefined" ? process.env.NEXT_PUBLIC_APP_URL || SITE.url : window.location.origin;
-  const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Origin: origin,
-      Referer: `${origin}/contact`,
-    },
-    body: JSON.stringify({
-      _subject: subject,
-      _template: "box",
-      _captcha: "false",
-      ...(replyTo ? { _replyto: replyTo } : {}),
-      ...fields,
-    }),
-  });
-  const data = (await response.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
-  const message = data.message || "";
-  if (/activat/i.test(message)) return;
-  if (!response.ok || data.success === "false" || data.success === false) {
-    throw new Error(message || `Could not deliver the message to ${to}.`);
-  }
+  await sendMail({ to, subject: input.title, text, html, replyTo: input.replyTo });
 }

@@ -43,15 +43,17 @@ export default function Page() {
       <section className="section-container pb-6">
         <h2 className="section-title">Beginner courses</h2>
         <div className="mt-4 flex flex-wrap gap-3">
+          <Link href="/courses/new-muslim-course" className="btn btn-green">New Muslim Course</Link>
           <Link href="/courses/namaz-course" className="btn btn-green">Namaz Course</Link>
-          <Link href="/courses/nazira-tul-quran" className="btn btn-green">Nazira tul Quran</Link>
-          <Link href="/courses/islamic-studies" className="btn btn-gold">Islamic Studies</Link>
+          <Link href="/courses/noorani-qaida" className="btn btn-green">Noorani Qaida</Link>
+          <Link href="/courses/taharat" className="btn btn-green">Taharat</Link>
+          <Link href="/courses" className="btn btn-gold">All Courses</Link>
         </div>
       </section>
       <section className="section-container py-12">
         <h2 className="section-title mb-6">FAQs</h2>
         <FaqAccordion items={faqs} />
-        <p className="mt-8 text-muted">Resources: Quran reader, Namaz course, Islamic studies, and the contact form for a personal welcome.</p>
+        <p className="mt-8 text-muted">Resources: Quran reader, Nazira Tul Quran, Tarjima tul Quran, and the contact form for a personal welcome.</p>
       </section>
     </>
   );
