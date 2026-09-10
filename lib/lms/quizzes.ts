@@ -44,17 +44,17 @@ export async function getQuiz(user: PublicUser, id: string, forAttempt = false) 
   await assertClassAccess(user, quiz.classId, user.role === "STUDENT" ? "view" : "manage");
   if (user.role === "STUDENT") {
     if (quiz.status !== "PUBLISHED") throw new HttpError(403, "This quiz is not available.");
-    const attempt = quiz.attempts.find((item) => item.studentId === user.id);
+    const attempt = quiz.attempts.find((item: any) => item.studentId === user.id);
     return {
       ...quiz,
-      questions: quiz.questions.map((question) => (forAttempt && attempt?.status !== "SUBMITTED" ? stripQuestion(question) : forAttempt ? question : stripQuestion(question))),
+      questions: quiz.questions.map((question: any) => (forAttempt && attempt?.status !== "SUBMITTED" ? stripQuestion(question) : forAttempt ? question : stripQuestion(question))),
       attempt: attempt || null,
       attempts: undefined,
     };
   }
   return {
     ...quiz,
-    attempts: quiz.attempts.map((attempt) => ({ ...attempt, student: toPublicUser(attempt.student) })),
+    attempts: quiz.attempts.map((attempt: any) => ({ ...attempt, student: toPublicUser(attempt.student) })),
   };
 }
 

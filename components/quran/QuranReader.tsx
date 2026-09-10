@@ -21,7 +21,7 @@ export default function QuranReader() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Array<{ surah: number; ayah: number; text: string }>>([]);
   const [translationId, setTranslationId] = useState<(typeof TRANSLATIONS)[number]["id"]>("en.sahih");
-  const [reciter, setReciter] = useState(RECITERS[0].identifier);
+  const [reciter, setReciter] = useState<string>(RECITERS[0].identifier);
   const [font, setFont] = useState(32);
   const [dark, setDark] = useState(false);
   const [reading, setReading] = useState(false);

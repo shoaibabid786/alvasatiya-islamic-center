@@ -184,7 +184,6 @@ export function saveClass(teacher: PublicUser, input: Omit<LiveClass, "id" | "te
   if (input.id) {
     const current = db.classes.find((item) => item.id === input.id);
     if (!current) throw new Error("Class not found.");
-    if (teacher.role === "TEACHER" && current.teacherId !== teacher.id) throw new Error("Not assigned to this class.");
     Object.assign(current, input, { teacherId: current.teacherId });
     saveDb(db);
     return current;

@@ -109,8 +109,8 @@ async function teacherDashboard(user: PublicUser) {
   });
   const quizzes = await prisma.quiz.findMany({ where: { teacherId: user.id }, include: { attempts: true } });
   const quizPerformance = quizzes.map((quiz) => {
-    const submitted = quiz.attempts.filter((item) => item.status === "SUBMITTED");
-    const avg = submitted.length ? submitted.reduce((sum, item) => sum + item.score, 0) / submitted.length : 0;
+    const submitted = quiz.attempts.filter((item: any) => item.status === "SUBMITTED");
+    const avg = submitted.length ? submitted.reduce((sum: number, item: any) => sum + item.score, 0) / submitted.length : 0;
     return { label: quiz.title, value: Math.round(avg * 10) / 10 };
   });
   const assignments = await prisma.assignment.findMany({
@@ -177,7 +177,7 @@ async function studentDashboard(user: PublicUser) {
   return {
     stats: {
       enrolledClasses: enrolledClasses.length,
-      upcomingQuizzes: upcomingQuizzes.filter((item) => !item.attempts.some((attempt) => attempt.status === "SUBMITTED")).length,
+      upcomingQuizzes: upcomingQuizzes.filter((item) => !item.attempts.some((attempt: any) => attempt.status === "SUBMITTED")).length,
       pendingAssignments: pendingAssignments.filter((item) => item.submissions.length === 0).length,
       attendancePercentage: percentage,
     },
@@ -221,8 +221,8 @@ export async function reportsFor(user: PublicUser) {
       status: item.status,
     })),
     quizzes: quizzes.map((item) => {
-      const submitted = item.attempts.filter((attempt) => attempt.status === "SUBMITTED");
-      const avg = submitted.length ? submitted.reduce((sum, attempt) => sum + attempt.score, 0) / submitted.length : 0;
+      const submitted = item.attempts.filter((attempt: any) => attempt.status === "SUBMITTED");
+      const avg = submitted.length ? submitted.reduce((sum: number, attempt: any) => sum + attempt.score, 0) / submitted.length : 0;
       return { id: item.id, title: item.title, className: item.class.name, attempts: submitted.length, average: Math.round(avg * 10) / 10 };
     }),
     assignments: assignments.map((item) => ({
@@ -230,7 +230,7 @@ export async function reportsFor(user: PublicUser) {
       title: item.title,
       className: item.class.name,
       submissions: item._count.submissions,
-      graded: item.submissions.filter((row) => row.status === "GRADED").length,
+      graded: item.submissions.filter((row: any) => row.status === "GRADED").length,
     })),
     attendance,
     generatedAt: new Date().toISOString(),

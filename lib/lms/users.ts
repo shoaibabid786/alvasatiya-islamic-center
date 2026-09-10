@@ -141,7 +141,7 @@ export async function getUserById(id: string) {
   if (!user) throw new HttpError(404, "User not found.");
   return {
     ...toPublicUser(user),
-    classes: user.role === "TEACHER" ? user.taughtClasses : user.memberships.map((item) => item.class),
+    classes: user.role === "TEACHER" ? user.taughtClasses : user.memberships.map((item: any) => item.class),
   };
 }
 

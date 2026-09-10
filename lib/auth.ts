@@ -59,7 +59,7 @@ export function toPublicUser(user: {
   studentCode?: string | null;
   dateOfBirth?: string | null;
   createdAt: Date | string;
-}): PublicUser {
+} | Record<string, any>): PublicUser {
   return {
     id: user.id,
     name: user.name,

@@ -38,13 +38,13 @@ export async function getAssignment(user: PublicUser, id: string) {
   if (user.role === "STUDENT") {
     return {
       ...assignment,
-      submission: assignment.submissions.find((item) => item.studentId === user.id) || null,
+      submission: assignment.submissions.find((item: any) => item.studentId === user.id) || null,
       submissions: undefined,
     };
   }
   return {
     ...assignment,
-    submissions: assignment.submissions.map((item) => ({ ...item, student: toPublicUser(item.student) })),
+    submissions: assignment.submissions.map((item: any) => ({ ...item, student: toPublicUser(item.student) })),
   };
 }
 

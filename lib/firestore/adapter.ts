@@ -255,16 +255,16 @@ export class FirestoreModel {
     private collectionName: string,
   ) {}
 
-  async findMany(args: Dict = {}) {
+  async findMany(args: Dict = {}): Promise<any[]> {
     return this.store.query(this.collectionName, args);
   }
 
-  async findFirst(args: Dict = {}) {
+  async findFirst(args: Dict = {}): Promise<any> {
     const rows = await this.store.query(this.collectionName, { ...args, take: 1 });
     return rows[0] || null;
   }
 
-  async findUnique(args: Dict = {}) {
+  async findUnique(args: Dict = {}): Promise<any> {
     const rows = await this.store.query(this.collectionName, { ...args, take: 1 });
     return rows[0] || null;
   }
@@ -274,7 +274,7 @@ export class FirestoreModel {
     return rows.length;
   }
 
-  async create(args: Dict) {
+  async create(args: Dict): Promise<any> {
     return this.store.create(this.collectionName, args);
   }
 
@@ -283,7 +283,7 @@ export class FirestoreModel {
     return { count: args.data.length };
   }
 
-  async update(args: Dict) {
+  async update(args: Dict): Promise<any> {
     return this.store.update(this.collectionName, args);
   }
 

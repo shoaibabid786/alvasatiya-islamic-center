@@ -70,11 +70,11 @@ export async function getClass(user: PublicUser, id: string) {
     ...row,
     joinUrl: classJoinUrl(row.code),
     teacher: row.teacher ? toPublicUser(row.teacher) : null,
-    students: row.members.map((item) => toPublicUser(item.student)),
+    students: row.members.map((item: any) => toPublicUser(item.student)),
   }, user);
 }
 
-function sanitizeClassJoin<T extends { code: string; joinUrl?: string }>(row: T, user: PublicUser) {
+function sanitizeClassJoin(row: any, user: PublicUser) {
   if (user.role === "ADMIN") return row;
   return { ...row, code: "", joinUrl: "" };
 }

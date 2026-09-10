@@ -228,7 +228,7 @@ async function main() {
       submittedAt: new Date(),
       score: 10,
       answers: {
-        create: questions.map((question: { id: string; correctAnswer: string }) => ({
+        create: questions.map((question: any) => ({
           questionId: question.id,
           selected: question.correctAnswer,
         })),
