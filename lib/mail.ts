@@ -55,7 +55,7 @@ function smtpUser() {
 }
 
 function smtpPass() {
-  return env("SMTP_PASS");
+  return env("SMTP_PASS").replace(/\s+/g, "");
 }
 
 function smtpHost() {
@@ -77,7 +77,8 @@ export function inboxEmail() {
 }
 
 function fromAddress() {
-  return env("MAIL_FROM") || smtpUser() || `Alvasatiya Islamic Center <${inboxEmail()}>`;
+  const user = smtpUser();
+  return user ? `Alvasatiya Islamic Center <${user}>` : env("MAIL_FROM") || `Alvasatiya Islamic Center <${inboxEmail()}>`;
 }
 
 function escapeHtml(value: string) {
@@ -119,15 +120,22 @@ function getTransporter() {
   if (!smtpConfigured()) {
     throw new Error("Email is not configured. Add SMTP_USER and SMTP_PASS (Gmail App Password) in .env, then restart npm run dev.");
   }
+  const user = smtpUser();
+  const pass = smtpPass();
   const port = Number(env("SMTP_PORT") || 587);
+  const host = smtpHost();
+  if (host === "smtp.gmail.com") {
+    return nodemailer.createTransport({
+      service: "gmail",
+      auth: { user, pass },
+    });
+  }
   return nodemailer.createTransport({
-    host: smtpHost(),
+    host,
     port,
     secure: port === 465,
-    auth: {
-      user: smtpUser(),
-      pass: smtpPass(),
-    },
+    requireTLS: port === 587,
+    auth: { user, pass },
   });
 }
 
@@ -150,8 +158,10 @@ export async function sendMail(input: {
     });
   } catch (error) {
     const raw = error instanceof Error ? error.message : "Could not send email.";
-    if (/invalid login|username and password|badcredentials|eauth/i.test(raw)) {
-      throw new Error("Gmail rejected the SMTP password. Put a 16-character App Password in SMTP_PASS (Google Account → App passwords), then restart npm run dev.");
+    if (/invalid login|username and password|badcredentials|eauth|535/i.test(raw)) {
+      throw new Error(
+        `Gmail rejected login for ${smtpUser()}. Sign into that same Gmail, turn on 2-Step Verification, create a new App Password (Security → 2-Step Verification → App passwords), and paste the 16-character code here.`,
+      );
     }
     throw new Error(raw);
   }
