@@ -10,6 +10,12 @@ export async function POST(request: Request) {
     const body = await request.json();
     const data = loginSchema.parse(body);
     const user = await loginAccount(data.email, data.password);
+    if (data.expectedRole && user.role !== data.expectedRole) {
+      return NextResponse.json(
+        { error: `This account is not a ${data.expectedRole.toLowerCase()} login.` },
+        { status: 403 }
+      );
+    }
     const session = await createSession(user.id, Boolean(data.remember));
     const publicUser = toPublicUser(user);
     const response = NextResponse.json({ user: publicUser, redirect: dashboardPath(publicUser.role) });

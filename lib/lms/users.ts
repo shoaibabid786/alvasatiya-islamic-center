@@ -10,6 +10,7 @@ import {
   teacherCreateSchema,
   teacherUpdateSchema,
 } from "@/lib/lms/schemas";
+import { removeUserFromFirebase, syncUserToFirebase } from "@/lib/firebase/user-sync";
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -50,6 +51,7 @@ export async function createUserAccount(input: {
       dateOfBirth: input.dateOfBirth || null,
     },
   });
+  await syncUserToFirebase(user, { password: input.password });
   return toPublicUser(user);
 }
 
@@ -91,7 +93,7 @@ export async function loginWithGoogle(idToken: string) {
     return existing;
   }
 
-  return prisma.user.create({
+  const created = await prisma.user.create({
     data: {
       name: google.name,
       email: google.email,
@@ -101,6 +103,8 @@ export async function loginWithGoogle(idToken: string) {
       profilePicture: google.photoUrl,
     },
   });
+  await syncUserToFirebase(created);
+  return created;
 }
 
 export async function listUsers(role: Role, q = "", status = "", page = 1, pageSize = 10) {
@@ -176,6 +180,7 @@ export async function updateTeacher(id: string, body: unknown) {
       await prisma.class.updateMany({ where: { id: { in: data.classIds } }, data: { teacherId: id } });
     }
   }
+  await syncUserToFirebase(updated, { password: data.password });
   return toPublicUser(updated);
 }
 
@@ -184,6 +189,7 @@ export async function deleteUser(id: string, role: Role) {
   if (!user || user.role !== role) throw new HttpError(404, `${role === "TEACHER" ? "Teacher" : "Student"} not found.`);
   if (user.role === "ADMIN") throw new HttpError(400, "Admin accounts cannot be deleted here.");
   await prisma.user.delete({ where: { id } });
+  await removeUserFromFirebase(user);
   return { ok: true, message: role === "TEACHER" ? "Teacher deleted successfully" : "Student deleted successfully" };
 }
 
@@ -192,6 +198,7 @@ export async function setUserStatus(id: string, status: string) {
   if (!user) throw new HttpError(404, "User not found.");
   if (user.role === "ADMIN") throw new HttpError(400, "The primary admin status cannot be changed this way.");
   const updated = await prisma.user.update({ where: { id }, data: { status } });
+  await syncUserToFirebase(updated);
   return toPublicUser(updated);
 }
 
@@ -232,6 +239,7 @@ export async function updateStudent(id: string, body: unknown) {
       });
     }
   }
+  await syncUserToFirebase(updated, { password: data.password });
   return toPublicUser(updated);
 }
 
@@ -250,6 +258,7 @@ export async function updateProfile(user: PublicUser, body: unknown) {
       profilePicture: data.profilePicture === undefined ? current.profilePicture : data.profilePicture,
     },
   });
+  await syncUserToFirebase(updated);
   return toPublicUser(updated);
 }
 

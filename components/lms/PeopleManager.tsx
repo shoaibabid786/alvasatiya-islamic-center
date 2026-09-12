@@ -48,9 +48,9 @@ export default function PeopleManager({ kind, base }: { kind: "teachers" | "stud
           <p className="text-sm text-slate-500">
             {kind === "students"
               ? base === "/admin"
-                ? "Only administrators can create student IDs. Students then log in with those credentials."
+                ? "Only administrators can create student IDs. Each new student is saved to Firebase."
                 : "Students in your assigned classes. Only an administrator can create a student ID."
-              : "Only administrators can add teachers. Teachers cannot create their own accounts."}
+              : "Only administrators can add teachers. Each new teacher is saved to Firebase."}
           </p>
         </div>
         {base === "/admin" ? (
@@ -148,7 +148,8 @@ export default function PeopleManager({ kind, base }: { kind: "teachers" | "stud
             <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </Field>
           <Field label="Password">
-            <PasswordInput required minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="new-password" />
+            <PasswordInput required minLength={6} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="new-password" />
+            <p className="mt-1 text-xs text-slate-500">At least 6 characters. Letters or numbers are both allowed.</p>
           </Field>
           {kind === "teachers" ? (
             <>

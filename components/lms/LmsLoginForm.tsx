@@ -112,7 +112,7 @@ export default function LmsLoginForm() {
             <p className="mt-3 text-xs uppercase tracking-[0.16em] text-teal-700">Alvasatiya</p>
             <h2 className="mt-1 text-2xl font-semibold text-slate-800">Sign in</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Continue with Google to create a simple visitor account. This does not create a student or teacher account. Staff and students sign in with email and password.
+              If you were given an ID, enter your email and password. You will be taken to your own account.
             </p>
           </div>
           <button

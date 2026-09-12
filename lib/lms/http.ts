@@ -11,12 +11,25 @@ export async function requireApiUser(roles?: Role[]) {
   return user;
 }
 
+function readableError(error: unknown) {
+  if (error instanceof HttpError) return error.message;
+  if (error && typeof error === "object" && "issues" in error && Array.isArray((error as { issues: unknown[] }).issues)) {
+    const messages = (error as { issues: Array<{ message?: string }> }).issues
+      .map((issue) => issue.message)
+      .filter((message): message is string => Boolean(message));
+    if (messages.length) return messages.join(" ");
+  }
+  if (error instanceof Error && error.message && !error.message.includes("invalid_format")) {
+    return error.message;
+  }
+  return "Please check the form and try again.";
+}
+
 export function jsonError(error: unknown) {
   if (error instanceof HttpError) {
     return NextResponse.json({ error: error.message }, { status: error.status });
   }
-  const message = error instanceof Error ? error.message : "Something went wrong";
-  return NextResponse.json({ error: message }, { status: 400 });
+  return NextResponse.json({ error: readableError(error) }, { status: 400 });
 }
 
 export function jsonOk<T>(data: T, status = 200) {

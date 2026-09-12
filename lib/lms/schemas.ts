@@ -4,6 +4,7 @@ export const loginSchema = z.object({
   email: z.string().trim().min(1, "Email is required"),
   password: z.string().min(1, "Password is required"),
   remember: z.boolean().optional(),
+  expectedRole: z.enum(["ADMIN", "TEACHER", "STUDENT"]).optional(),
 });
 
 export const googleLoginSchema = z.object({
@@ -13,9 +14,7 @@ export const googleLoginSchema = z.object({
 
 export const passwordSchema = z
   .string()
-  .min(8, "Password must be at least 8 characters")
-  .regex(/[A-Za-z]/, "Password must include a letter")
-  .regex(/[0-9]/, "Password must include a number");
+  .min(6, "Password must be at least 6 characters");
 
 export const teacherCreateSchema = z.object({
   name: z.string().trim().min(2, "Full name is required"),

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
+import { createUserAccount } from "@/lib/lms/users";
 import {
   addFeedback,
-  adminCreateTeacher,
   adminUpdateUser,
   assignTeacher,
   createAdminCourse,
@@ -36,7 +36,16 @@ export async function POST(request: Request) {
     if (user.role === "ADMIN") {
       if (action === "updateDemo") return NextResponse.json(updateDemo(body.id, { status: body.status, scheduledAt: body.scheduledAt }));
       if (action === "updateUser") return NextResponse.json(adminUpdateUser(body.id, { status: body.status, role: body.role, name: body.name }));
-      if (action === "createTeacher") return NextResponse.json(adminCreateTeacher(body));
+      if (action === "createTeacher") {
+        return NextResponse.json(
+          await createUserAccount({
+            name: String(body.name || ""),
+            email: String(body.email || ""),
+            password: String(body.password || ""),
+            role: "TEACHER",
+          }),
+        );
+      }
       if (action === "assignTeacher") return NextResponse.json(assignTeacher(body.enrollmentId, body.teacherId));
       if (action === "saveCourse") return NextResponse.json(upsertCourseOverride(body.course));
       if (action === "createCourse") return NextResponse.json(createAdminCourse(body));
