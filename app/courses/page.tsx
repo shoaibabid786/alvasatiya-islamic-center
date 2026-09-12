@@ -3,6 +3,7 @@ import WhatWeTeach from "@/components/academy/WhatWeTeach";
 import WhyChoose from "@/components/academy/WhyChoose";
 import ThreeSteps from "@/components/academy/ThreeSteps";
 import CoursesBrowser from "@/components/interactive/CoursesBrowser";
+import CourseTestimonials from "@/components/academy/CourseTestimonials";
 import { getPublishedCourses } from "@/lib/catalog";
 import { pageMeta } from "@/lib/seo";
 
@@ -20,7 +21,7 @@ export default function Page() {
     <>
       <CoursesHeroSlider />
       <WhatWeTeach />
-      <section className="section-container py-12">
+      <section id="course-catalog" className="section-container py-12">
         <p className="section-eyebrow">Catalog</p>
         <h2 className="section-title">Our Courses</h2>
         <div className="geometric-divider !mx-0" />
@@ -29,6 +30,7 @@ export default function Page() {
         </p>
         <CoursesBrowser courses={catalog} />
       </section>
+      <CourseTestimonials />
       <WhyChoose />
       <ThreeSteps />
     </>

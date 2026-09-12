@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(process.cwd()),
   },
+  async redirects() {
+    return [{ source: "/institutions/alvasatiya-it-lab", destination: "/institutions/ths-it-lab", permanent: true }];
+  },
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: "inline",

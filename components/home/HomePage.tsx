@@ -6,7 +6,6 @@ import FounderSection from "@/components/home/FounderSection";
 import PillarsSection from "@/components/home/PillarsSection";
 import AboutImpactSection from "@/components/home/AboutImpactSection";
 import FeaturedCourses from "@/components/academy/FeaturedCourses";
-import WhyChoose from "@/components/academy/WhyChoose";
 import ThreeSteps from "@/components/academy/ThreeSteps";
 import InstitutionsSection from "@/components/home/InstitutionsSection";
 import ServicesInstitutionsSection from "@/components/home/ServicesInstitutionsSection";
@@ -29,7 +28,6 @@ export default function HomePage() {
       <AboutImpactSection />
       <HomeStripBanner title="Learn the Qur'an with Top Scholars" />
       <FeaturedCourses />
-      <WhyChoose />
       <ThreeSteps />
       <InstitutionsSection />
       <ServicesInstitutionsSection />

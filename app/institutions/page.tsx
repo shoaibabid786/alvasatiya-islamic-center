@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = pageMeta(
   "Institutions & Branches | Jamia Umme Ashraf Jamal and Tehfeez-ul-Quran",
-  "Explore Alvasatiya's headquarters at Jamia Umme Ashraf Jamal, five Tehfeez-ul-Quran Hifz branches, IT Lab, and Science Academy in Lahore.",
+  "Explore Alvasatiya's headquarters at Jamia Umme Ashraf Jamal, five Tehfeez-ul-Quran Hifz branches, THS IT Lab, and Science Academy in Lahore.",
   "/institutions"
 );
 

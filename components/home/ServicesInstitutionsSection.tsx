@@ -2,7 +2,13 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, Building2, FlaskConical, Landmark, Monitor } from "lucide-react";
 import { getServiceInstitutions } from "@/lib/institutions";
 
-const ICONS = [Building2, Landmark, Monitor, FlaskConical, BookOpen];
+const ICONS: Record<string, typeof Landmark> = {
+  "jamia-umme-ashraf-jamal": Building2,
+  "alvasatiya-islamic-center": Landmark,
+  "alvasatiya-tehfeez-ul-quran": BookOpen,
+  "alvasatiya-science-academy": FlaskConical,
+  "alvasatiya-it-lab": Monitor,
+};
 
 const COPY: Record<string, string> = {
   "jamia-umme-ashraf-jamal":
@@ -14,7 +20,7 @@ const COPY: Record<string, string> = {
   "alvasatiya-science-academy":
     "Science and academic education alongside Islamic studies, so students grow in both religious and worldly knowledge.",
   "alvasatiya-it-lab":
-    "Computer and technology education so students can gain practical digital skills.",
+    "Donated by Taleem o Hunar Society. Students learn basic computer, video editing, graphic designing, basic AI, and more.",
 };
 
 export default function ServicesInstitutionsSection() {
@@ -42,7 +48,7 @@ export default function ServicesInstitutionsSection() {
         </p>
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {cards.map((item, index) => {
-            const Icon = ICONS[index] ?? Landmark;
+            const Icon = ICONS[item.slug] ?? Landmark;
             const featured = index === 0;
             return (
               <Link

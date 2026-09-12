@@ -37,7 +37,7 @@ export const NAV: NavItem[] = [
       { label: "Headquarters — Jamia Umme Ashraf Jamal", href: "/institutions/jamia-umme-ashraf-jamal" },
       { label: "Branches — Tehfeez-ul-Quran", href: "/institutions/alvasatiya-tehfeez-ul-quran" },
       { label: "Alvasatiya Islamic Center", href: "/institutions/alvasatiya-islamic-center" },
-      { label: "Alvasatiya IT Lab", href: "/institutions/alvasatiya-it-lab" },
+      { label: "THS IT Lab", href: "/institutions/ths-it-lab" },
       { label: "Alvasatiya Science Academy", href: "/institutions/alvasatiya-science-academy" },
       { label: "What We Provide", href: "/what-we-provide" },
     ],
@@ -74,7 +74,7 @@ export const NAV: NavItem[] = [
     children: [
       { label: "Jamia Umme Ashraf Jamal", href: "/departments/jamia-umme-ashraf-jamal" },
       { label: "Tehfeez-ul-Quran", href: "/departments/tehfeez-ul-quran" },
-      { label: "IT Lab", href: "/departments/it-lab" },
+      { label: "THS IT Lab", href: "/institutions/ths-it-lab" },
       { label: "Science Academy", href: "/departments/science-academy" },
       { label: "Welfare Services", href: "/departments/welfare" },
       { label: "Social Media", href: "/departments/social-media" },

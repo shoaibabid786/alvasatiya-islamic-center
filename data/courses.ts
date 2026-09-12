@@ -61,59 +61,15 @@ export const FEATURED_COURSE_SLUGS = [
   "tarjima-tul-quran",
   "tafseer-ul-quran",
   "ilm-ul-hadees",
-  "ilm-ul-fiqh",
-  "usul-al-hadees",
-  "usul-al-fiqh",
-  "ilm-ul-fraiz",
-  "dars-e-nizami",
-  "khatam-e-nabuwat",
-  "taharat",
-  "hajj-course",
-  "umrah-course",
-  "new-muslim-course",
-  "ahkam-e-shariat",
-  "basic-islam-for-children",
-  "basic-islam-for-youngers",
-  "urdu-language-course",
-  "famous-surahs-hifaz",
-  "noorani-qaida",
-  "adaab-e-parents",
-  "ahl-e-bait",
-  "parents-of-muhammad",
-  "qurbani-course",
-  "seerat-e-mustafa",
-  "namaz-course",
 ] as const;
 
 export const WHAT_WE_TEACH = [
-  { title: "Nazira Tul Quran", slug: "nazira-tul-quran", text: "Look-and-read Quran study with fluency and teacher listening." },
-  { title: "Hifaz ul Quran", slug: "hifaz-ul-quran", text: "A structured memorization path with new lesson and revision." },
-  { title: "Tajweed o Qirat", slug: "tajweed-o-qirat", text: "Correct pronunciation and beautiful recitation under teacher care." },
-  { title: "Tarjima tul Quran", slug: "tarjima-tul-quran", text: "Understand Quranic meanings through guided translation study." },
-  { title: "Tafseer ul Quran", slug: "tafseer-ul-quran", text: "Selected-passage tafsir with teacher explanation and careful notes." },
-  { title: "Ilm ul Hadees", slug: "ilm-ul-hadees", text: "Study selected Hadith and prophetic manners with teacher explanation." },
-  { title: "Ilm ul Fiqh", slug: "ilm-ul-fiqh", text: "Practical Islamic jurisprudence of worship and daily life at an educational level." },
-  { title: "Usul al Hadees", slug: "usul-al-hadees", text: "Foundations of Hadith methodology with humility and teacher guidance." },
-  { title: "Usul al Fiqh", slug: "usul-al-fiqh", text: "How scholars approach evidence — educational, not for issuing fatwas." },
-  { title: "Ilm ul Fraiz", slug: "ilm-ul-fraiz", text: "Educational study of Islamic inheritance with teacher notes." },
-  { title: "Dars e Nizami", slug: "dars-e-nizami", text: "A classical Islamic sciences pathway with qualified teacher guidance." },
-  { title: "Khatam e Nabuwat", slug: "khatam-e-nabuwat", text: "The finality of prophethood taught with care, evidence, and adab." },
-  { title: "Taharat", slug: "taharat", text: "Purification for worship: wudu, ghusl, and related fiqh at a student level." },
-  { title: "Hajj Course", slug: "hajj-course", text: "Educational preparation for Hajj and Umrah rites with teacher notes." },
-  { title: "Umrah Course", slug: "umrah-course", text: "Educational outline of Umrah rites with teacher notes before travel." },
-  { title: "New Muslim Course", slug: "new-muslim-course", text: "A calm beginner path: Shahadah, wudu, Salah, and basic beliefs." },
-  { title: "Ahkam e Shariat", slug: "ahkam-e-shariat", text: "Everyday rulings of Shariah taught as education, not as fatwa." },
-  { title: "Basic Islam for Children", slug: "basic-islam-for-children", text: "Gentle lessons in belief, Salah, and manners for children." },
-  { title: "Basic Islam for Youngers", slug: "basic-islam-for-youngers", text: "Clear Islamic foundations for teens and youth with adab and character." },
-  { title: "Urdu Language Course", slug: "urdu-language-course", text: "Read, write, and speak Urdu for Islamic study and daily use." },
-  { title: "Famous Surahs Hifaz", slug: "famous-surahs-hifaz", text: "Memorize selected well-known surahs with revision and teacher listening." },
-  { title: "Noorani Qaida", slug: "noorani-qaida", text: "Letters and joining so students are ready for Nazira Tul Quran." },
-  { title: "Adaab e Parents", slug: "adaab-e-parents", text: "Honouring parents through Quran, Hadith, and daily manners." },
-  { title: "Ahl e Bait Course", slug: "ahl-e-bait", text: "Love and respect for the household of the Prophet ﷺ, taught with adab." },
-  { title: "Parents of Muhammad ﷺ", slug: "parents-of-muhammad", text: "Seerah lessons on the noble parents of the Messenger ﷺ." },
-  { title: "Qurbani Course", slug: "qurbani-course", text: "Educational study of Qurbani / Udhiyah with teacher notes." },
-  { title: "Seerat e Mustafa", slug: "seerat-e-mustafa", text: "The blessed life of Prophet Muhammad ﷺ taught with love and care." },
-  { title: "Namaz Course", slug: "namaz-course", text: "Learn Salah step by step: wudu, movements, and short recitation." },
+  { title: "Memorize Quran", slug: "hifaz-ul-quran", text: "A structured Hifz path with new lesson, revision, and teacher listening." },
+  { title: "Quran Translation", slug: "tarjima-tul-quran", text: "Understand the meanings of the Quran through guided Tarjima study." },
+  { title: "Quran Learning", slug: "nazira-tul-quran", text: "Look-and-read fluency with Arabic letters, joining, and careful recitation." },
+  { title: "Hadith Learning", slug: "ilm-ul-hadees", text: "Selected Hadith and prophetic manners explained with adab and clarity." },
+  { title: "Tajweed Rules", slug: "tajweed-o-qirat", text: "Correct pronunciation and beautiful recitation, taught step by step." },
+  { title: "Dars-e-Nizami", slug: "dars-e-nizami", text: "A classical pathway in the Islamic sciences with qualified teachers." },
 ] as const;
 
 const TEACHER = "Qualified Alvasatiya teachers";
@@ -1072,7 +1028,9 @@ export function getCourse(slug: string, list: Course[] = courses) {
 }
 
 export function getFeaturedCourses(list: Course[] = courses) {
-  return FEATURED_COURSE_SLUGS.map((slug) => getCourse(slug, list)).filter((c): c is Course => Boolean(c));
+  return FEATURED_COURSE_SLUGS.map((slug) => getCourse(slug, list))
+    .filter((c): c is Course => Boolean(c))
+    .slice(0, 6);
 }
 
 export function allCourseParams(list: Course[] = courses) {

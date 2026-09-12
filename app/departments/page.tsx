@@ -4,8 +4,8 @@ import { departments } from "@/data/departments";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta(
-  "Alvasatiya Departments | Jamia, Tehfeez, IT Lab, Science Academy and Welfare",
-  "Alvasatiya departments: Jamia Umme Ashraf Jamal, Tehfeez-ul-Quran, IT Lab, Science Academy, welfare, social media and online courses.",
+  "Alvasatiya Departments | Jamia, Tehfeez, THS IT Lab, Science Academy and Welfare",
+  "Alvasatiya departments: Jamia Umme Ashraf Jamal, Tehfeez-ul-Quran, THS IT Lab, Science Academy, welfare, social media and online courses.",
   "/departments"
 );
 
