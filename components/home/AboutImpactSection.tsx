@@ -53,8 +53,8 @@ export default function AboutImpactSection() {
             </div>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Link href="/about/introduction" className="btn btn-gold">
-                Read our introduction
+              <Link href="/about/introduction" className="btn bg-gold hover:text-white hover:bg-[#283618]">
+                Read our introductiond
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link href="/about" className="btn btn-outline">

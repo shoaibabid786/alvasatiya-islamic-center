@@ -70,7 +70,7 @@ export const founder = {
     "Guiding a balanced, knowledge-based public message",
   ],
   message:
-    "[Approved founder message to be added here.]",
+    "[Pyar Mohabbat and ikhlas]",
 };
 
 export const achievements = [
