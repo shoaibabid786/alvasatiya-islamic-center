@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, MapPin, MessageCircle, MessageSquare, Phone } from "lucide-react";
 import { SITE } from "@/data/site";
 import Logo from "@/components/ui/Logo";
 
@@ -32,8 +32,6 @@ const SOCIAL = [
 ].filter((item) => item.href);
 
 export default function Footer() {
-  const phoneHref = `tel:${SITE.phone.replace(/\s/g, "")}`;
-
   return (
     <footer className="mt-auto bg-green-deep text-ivory islamic-pattern">
       <div className="section-container py-14">
@@ -72,8 +70,20 @@ export default function Footer() {
               </li>
               <li className="flex gap-2">
                 <Phone className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-                <a href={phoneHref} className="hover:text-gold">
-                  {SITE.phone}
+                <a href={`tel:${SITE.localPhone}`} className="hover:text-gold">
+                  {SITE.localPhone}
+                </a>
+              </li>
+              <li className="flex gap-2">
+                <MessageCircle className="w-4 h-4 text-gold shrink-0 mt-0.5" />
+                <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="hover:text-gold">
+                  WhatsApp
+                </a>
+              </li>
+              <li className="flex gap-2">
+                <MessageSquare className="w-4 h-4 text-gold shrink-0 mt-0.5" />
+                <a href={`sms:${SITE.localPhone}`} className="hover:text-gold">
+                  SMS
                 </a>
               </li>
               <li className="flex gap-2">

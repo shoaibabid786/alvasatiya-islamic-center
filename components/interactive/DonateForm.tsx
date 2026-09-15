@@ -191,8 +191,7 @@ export default function DonateForm() {
             <dl className="mt-3">
               <Detail label="Name" value={DONATE_ACCOUNT.name} />
               <Detail label="Father Name" value={DONATE_ACCOUNT.fatherName} />
-              <Detail label="Identity Card" value={DONATE_ACCOUNT.identityCard} />
-              <Detail label="Date of Birth" value={DONATE_ACCOUNT.dateOfBirth} />
+              <Detail label="Phone" value={DONATE_ACCOUNT.phone} />
             </dl>
           </div>
 

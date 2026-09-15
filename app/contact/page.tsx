@@ -5,7 +5,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta(
   "Contact Alvasatiya Islamic Center | Address, Phone, Email and Message Form",
-  "Visit Jamia Umme Ashraf Jamal in Lahore, call +92 300 4840308, or send a message to Alvasatiya Islamic Center.",
+  "Visit Jamia Umme Ashraf Jamal in Lahore, call or SMS 03004840308, WhatsApp, or send a message to Alvasatiya Islamic Center.",
   "/contact"
 );
 
@@ -22,11 +22,28 @@ export default function Page() {
             <p className="text-muted mt-2">{SITE.headquarters}<br />{SITE.address}</p>
           </article>
           <article className="card-surface p-6">
-            <h2 className="font-semibold text-green-deep">Phone & email</h2>
-            <p className="text-muted mt-2">
-              <a className="text-green-deep underline" href={`tel:${SITE.phone.replace(/\s/g, "")}`}>{SITE.phone}</a>
-              <br />
-              <a className="text-green-deep underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+            <h2 className="font-semibold text-green-deep">Phone, WhatsApp &amp; SMS</h2>
+            <p className="text-muted mt-2">{SITE.localPhone}</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a className="btn btn-green !py-2" href={`tel:${SITE.localPhone}`}>
+                Call
+              </a>
+              <a
+                className="btn btn-gold !py-2"
+                href={`https://wa.me/${SITE.whatsapp}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                WhatsApp
+              </a>
+              <a className="btn btn-outline !py-2" href={`sms:${SITE.localPhone}`}>
+                SMS
+              </a>
+            </div>
+            <p className="mt-4">
+              <a className="text-green-deep underline" href={`mailto:${SITE.email}`}>
+                {SITE.email}
+              </a>
             </p>
           </article>
           <article className="card-surface p-6">

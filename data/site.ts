@@ -10,6 +10,7 @@ export const SITE = {
   ayahEnglish: "And thus We have made you a justly balanced nation.",
   ayahRef: "Al-Baqarah 2:143",
   phone: "+92 300 4840308",
+  localPhone: "03004840308",
   email: "alvasatiya4@gmail.com",
   address: "24 KM Glaxo Town, Ferozpur Road, Lahore, Pakistan",
   headquarters: "Jamia Umme Ashraf Jamal",
