@@ -70,7 +70,7 @@ export const founder = {
     "Guiding a balanced, knowledge-based public message",
   ],
   message:
-    "[Pyar Mohabbat and ikhlas]",
+    "[“Show kindness, love, and compassion to all of God’s creation. Let your words and actions reflect care, respect, and humanity.”]",
 };
 
 export const achievements = [
