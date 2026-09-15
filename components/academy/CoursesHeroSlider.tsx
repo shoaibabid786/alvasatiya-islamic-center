@@ -40,7 +40,10 @@ export default function CoursesHeroSlider() {
         touchX.current = null;
       }}
     >
-      {COURSE_SLIDER.map((slide, i) => (
+      {COURSE_SLIDER.map((slide, i) => {
+        const nearby = Math.abs(i - index) <= 1 || (index === 0 && i === COURSE_SLIDER.length - 1) || (index === COURSE_SLIDER.length - 1 && i === 0);
+        if (!nearby) return null;
+        return (
         <div
           key={slide.src}
           className={`absolute inset-0 transition-opacity duration-700 ${i === index ? "opacity-100" : "opacity-0"}`}
@@ -51,12 +54,15 @@ export default function CoursesHeroSlider() {
             alt={slide.alt}
             fill
             priority={i === 0}
+            loading={i === 0 ? "eager" : "lazy"}
+            quality={60}
             className="object-cover"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-green-deep/15" />
         </div>
-      ))}
+        );
+      })}
       <button
         type="button"
         className="absolute left-3 md:left-6 top-1/2 z-20 w-11 h-11 -translate-y-1/2 rounded-full border border-gold/50 bg-green-deep/50 text-gold transition duration-200 hover:border-gold hover:bg-gold hover:text-green-deep hover:shadow-md"

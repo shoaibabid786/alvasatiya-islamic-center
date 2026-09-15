@@ -5,7 +5,7 @@ import { getHeadquarters, getServiceInstitutions, getTehfeezBranches } from "@/l
 import { pageMeta } from "@/lib/seo";
 import CountUp from "@/components/ui/CountUp";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = pageMeta(
   "Institutions & Branches | Jamia Umme Ashraf Jamal and Tehfeez-ul-Quran",

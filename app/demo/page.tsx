@@ -2,7 +2,7 @@ import DemoForm from "@/components/academy/DemoForm";
 import { getPublishedCourses } from "@/lib/catalog";
 import { pageMeta } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = pageMeta(
   "Book a Free Demo | Alvasatiya Islamic Courses",

@@ -1,6 +1,6 @@
+import dynamic from "next/dynamic";
 import HeroSlider from "@/components/home/HeroSlider";
 import DailyWisdomSection from "@/components/home/DailyWisdomSection";
-import ServiceCarousel from "@/components/home/ServiceCarousel";
 import QuranSection from "@/components/home/QuranSection";
 import FounderSection from "@/components/home/FounderSection";
 import PillarsSection from "@/components/home/PillarsSection";
@@ -13,7 +13,9 @@ import MissionCareSection from "@/components/home/MissionCareSection";
 import SupportUsSection from "@/components/home/SupportUsSection";
 import WhatWeProvideSection from "@/components/home/WhatWeProvideSection";
 import HomeStripBanner from "@/components/home/HomeStripBanner";
-import SuccessStoriesCarousel from "@/components/home/SuccessStoriesCarousel";
+
+const ServiceCarousel = dynamic(() => import("@/components/home/ServiceCarousel"));
+const SuccessStoriesCarousel = dynamic(() => import("@/components/home/SuccessStoriesCarousel"));
 
 export default function HomePage() {
   return (

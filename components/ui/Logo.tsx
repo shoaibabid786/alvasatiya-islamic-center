@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { SITE } from "@/data/site";
 
@@ -9,15 +8,14 @@ type Props = {
   href?: string | false;
 };
 
-export default function Logo({ size = 72, priority = false, className = "", href = "/" }: Props) {
+export default function Logo({ size = 48, className = "", href = "/" }: Props) {
   const img = (
-    <Image
-      src={SITE.logo}
-      alt="Alvasatiya Islamic Center official logo"
+    <img
+      src="/favicon.svg"
+      alt="Alvasatiya Islamic Center"
       width={size}
       height={size}
-      priority={priority}
-      className={`rounded-full object-cover shadow-[0_6px_16px_rgba(40,54,24,0.18)] ${className}`}
+      className={`rounded-full object-cover ${className}`}
       style={{ width: size, height: size }}
     />
   );

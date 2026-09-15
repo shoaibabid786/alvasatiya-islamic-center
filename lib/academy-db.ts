@@ -228,15 +228,19 @@ function seed(): AcademyDb {
   };
 }
 
+let memoryDb: AcademyDb | null = null;
+
 export function getDb(): AcademyDb {
+  if (memoryDb) return memoryDb;
   if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
   if (!existsSync(FILE)) {
     const created = seed();
     writeFileSync(FILE, JSON.stringify(created, null, 2));
+    memoryDb = created;
     return created;
   }
   const parsed = JSON.parse(readFileSync(FILE, "utf8")) as AcademyDb;
-  return {
+  memoryDb = {
     users: parsed.users ?? [],
     sessions: parsed.sessions ?? [],
     demos: parsed.demos ?? [],
@@ -254,9 +258,11 @@ export function getDb(): AcademyDb {
     courseOverrides: parsed.courseOverrides ?? [],
     institutionOverrides: parsed.institutionOverrides ?? [],
   };
+  return memoryDb;
 }
 
 export function saveDb(db: AcademyDb) {
+  memoryDb = db;
   if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
   writeFileSync(FILE, JSON.stringify(db, null, 2));
 }

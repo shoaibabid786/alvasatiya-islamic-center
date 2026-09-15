@@ -30,6 +30,7 @@ export default function QuranSection() {
               src="/images/hero/quran.png"
               alt="Open Quran with Arabic calligraphy in a peaceful mosque setting"
               fill
+              quality={60}
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />

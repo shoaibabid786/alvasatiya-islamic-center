@@ -36,7 +36,7 @@ export default function Footer() {
     <footer className="mt-auto bg-green-deep text-ivory islamic-pattern">
       <div className="section-container py-14">
       <div className="mb-10 flex flex-col items-center text-center">
-        <Logo size={88} />
+        <Logo size={56} />
         <p className="mt-4 text-2xl font-bold uppercase tracking-[0.12em] text-gold-soft sm:text-3xl">
           Alvasatiya Islamic Center
         </p>

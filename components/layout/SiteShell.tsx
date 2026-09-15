@@ -1,6 +1,4 @@
-"use client";
-
-import { usePathname } from "next/navigation";
+import { headers } from "next/headers";
 import QuranBanner from "@/components/layout/QuranBanner";
 import SloganBar from "@/components/layout/SloganBar";
 import BrandBar from "@/components/layout/BrandBar";
@@ -22,9 +20,11 @@ function isAuthPage(pathname: string) {
   return pathname === "/login" || pathname === "/signup" || pathname.startsWith("/forgot-password");
 }
 
-export default function SiteShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+export default async function SiteShell({ children }: { children: React.ReactNode }) {
+  const pathname = (await headers()).get("x-pathname") || "";
   if (isLmsPath(pathname)) return <>{children}</>;
+  const hideChrome = isAuthPage(pathname);
+
   return (
     <div className="min-h-screen flex flex-col">
       <a href="#main" className="skip-link">
@@ -34,11 +34,11 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       <SloganBar />
       <BrandBar />
       <Navbar />
-      {isAuthPage(pathname) ? null : <BreadcrumbBar />}
+      {hideChrome ? null : <BreadcrumbBar />}
       <main id="main" className="flex-1">
         {children}
       </main>
-      {isAuthPage(pathname) ? null : <Footer />}
+      {hideChrome ? null : <Footer />}
       <BackToTop />
     </div>
   );

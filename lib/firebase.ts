@@ -42,7 +42,6 @@ export function getFirestoreDb(): Firestore {
   }
   const settings = {
     ignoreUndefinedProperties: true,
-    ...(typeof window === "undefined" ? { experimentalForceLongPolling: true } : {}),
   };
   try {
     firestoreDb = initializeFirestore(app, settings, FIRESTORE_DATABASE_ID);

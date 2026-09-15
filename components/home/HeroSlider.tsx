@@ -54,7 +54,10 @@ export default function HeroSlider() {
         touchX.current = null;
       }}
     >
-      {heroSlides.map((slide, i) => (
+      {heroSlides.map((slide, i) => {
+        const nearby = Math.abs(i - index) <= 1 || (index === 0 && i === heroSlides.length - 1) || (index === heroSlides.length - 1 && i === 0);
+        if (!nearby) return null;
+        return (
         <div
           key={slide.id}
           className={`absolute inset-0 transition-opacity duration-700 ${i === index ? "opacity-100" : "opacity-0"}`}
@@ -65,13 +68,16 @@ export default function HeroSlider() {
             alt={slide.alt}
             fill
             priority={i === 0}
+            loading={i === 0 ? "eager" : "lazy"}
+            quality={60}
             className="object-cover object-[center_30%] md:object-[center_25%] lg:object-center"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-green-deep/90 via-green-deep/55 to-teal/20" />
           <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-green-deep/70 to-transparent" />
         </div>
-      ))}
+        );
+      })}
 
       <div className="relative z-10 h-full section-container flex items-center">
         <div className="max-w-xl text-ivory animate-fade-up" aria-live="polite">

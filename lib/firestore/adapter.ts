@@ -107,7 +107,7 @@ const COUNT_MAP: Record<string, Record<string, { collection: string; key: string
 };
 
 const cache: Record<string, { at: number; rows: Dict[] }> = {};
-const CACHE_MS = 3000;
+const CACHE_MS = 60_000;
 
 function now() {
   return new Date();

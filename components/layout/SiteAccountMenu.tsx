@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ChevronDown, Heart, LogOut, UserRound } from "lucide-react";
 import { endClientSession } from "@/lib/lms/end-session";
 import { dashboardPath, type PublicUser } from "@/lib/lms/types";
@@ -32,17 +31,36 @@ function AccountAvatar({ user, size = "sm" }: { user: PublicUser; size?: "sm" | 
 }
 
 export default function SiteAccountMenu({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
-  const pathname = usePathname();
   const [user, setUser] = useState<PublicUser | null>(null);
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("/api/profile", { method: "POST", credentials: "include", cache: "no-store" })
+    let cancelled = false;
+    const cached = sessionStorage.getItem("alvasatiya-user");
+    if (cached) {
+      try {
+        setUser(JSON.parse(cached));
+      } catch {
+        sessionStorage.removeItem("alvasatiya-user");
+      }
+    }
+    fetch("/api/profile", { method: "POST", credentials: "include" })
       .then((res) => res.json())
-      .then((data) => setUser(data.user || null))
-      .catch(() => setUser(null));
-  }, [pathname]);
+      .then((data) => {
+        if (cancelled) return;
+        const next = data.user || null;
+        setUser(next);
+        if (next) sessionStorage.setItem("alvasatiya-user", JSON.stringify(next));
+        else sessionStorage.removeItem("alvasatiya-user");
+      })
+      .catch(() => {
+        if (!cancelled) setUser(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {

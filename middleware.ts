@@ -12,8 +12,9 @@ const ROLE_PREFIX: Record<string, Role> = {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-  const session = await readSessionToken(token);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", pathname);
+
   const first = pathname.split("/")[1];
   const expected = ROLE_PREFIX[first];
   const needsAuth =
@@ -21,6 +22,9 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/portal") ||
     pathname.startsWith("/pay") ||
     pathname.startsWith("/join");
+
+  const token = needsAuth || pathname === "/login" ? request.cookies.get(SESSION_COOKIE)?.value : undefined;
+  const session = token ? await readSessionToken(token) : null;
 
   if (needsAuth && !session) {
     const login = new URL("/login", request.url);
@@ -36,7 +40,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  return NextResponse.next();
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {

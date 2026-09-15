@@ -7,7 +7,7 @@ import CourseTestimonials from "@/components/academy/CourseTestimonials";
 import { getPublishedCourses } from "@/lib/catalog";
 import { pageMeta } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = pageMeta(
   "Islamic Courses | Quran, Dars e Nizami, Fiqh and Hajj",

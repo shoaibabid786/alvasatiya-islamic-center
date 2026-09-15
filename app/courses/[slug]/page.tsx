@@ -6,7 +6,7 @@ import { getPublishedCourse } from "@/lib/catalog";
 import { pageMeta } from "@/lib/seo";
 import { courseSchema, faqSchema } from "@/lib/schema";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 export const dynamicParams = true;
 
 export function generateStaticParams() {

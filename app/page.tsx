@@ -3,7 +3,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { pageMeta } from "@/lib/seo";
 import { eventSchema } from "@/lib/schema";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = pageMeta(
   "Alvasatiya Islamic Center | Quran Learning, Islamic Education & Community Service",

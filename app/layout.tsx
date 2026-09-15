@@ -10,8 +10,9 @@ import { organizationSchema, websiteSchema } from "@/lib/schema";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "600", "700"],
   display: "swap",
+  preload: true,
 });
 
 const amiri = Amiri({
@@ -32,11 +33,8 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   formatDetection: { telephone: true, email: true },
   icons: {
-    icon: [
-      { url: SITE.icon, sizes: "48x48" },
-      { url: SITE.logo, type: "image/png" },
-    ],
-    apple: SITE.logo,
+    icon: [{ url: SITE.icon, sizes: "48x48" }],
+    apple: SITE.icon,
     shortcut: SITE.icon,
   },
   openGraph: {
@@ -46,13 +44,13 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     locale: "en_US",
     type: "website",
-    images: [{ url: SITE.logo, alt: `${SITE.name} official logo` }],
+    images: [{ url: SITE.icon, alt: `${SITE.name} official logo` }],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: SITE.name,
     description: SITE.description,
-    images: [SITE.logo],
+    images: [SITE.icon],
   },
   robots: {
     index: true,

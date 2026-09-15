@@ -6,7 +6,7 @@ import { getPublishedInstitution } from "@/lib/institutions";
 import { pageMeta } from "@/lib/seo";
 import { educationalOrgSchema, faqSchema } from "@/lib/schema";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 export const dynamicParams = true;
 
 export function generateStaticParams() {
