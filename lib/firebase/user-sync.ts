@@ -1,6 +1,5 @@
-import { deleteDoc, doc, setDoc } from "firebase/firestore";
-import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 import { prisma } from "@/lib/prisma";
+import { getAdminAuth, getAdminFirestore, isFirebaseAdminConfigured } from "@/lib/firebase-admin";
 import type { Role } from "@/lib/lms/types";
 
 const ROLE_COLLECTION: Record<Role, string> = {
@@ -54,47 +53,58 @@ function roleCollection(role: string) {
   return ROLE_COLLECTION[role as Role] || "visitors";
 }
 
-async function createFirebaseAuthUser(email: string, password: string) {
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-  if (!apiKey || !password) return null;
-  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, returnSecureToken: true }),
-  });
-  const data = (await response.json().catch(() => ({}))) as { localId?: string; error?: { message?: string } };
-  if (data.localId) return data.localId;
-  return null;
-}
-
-export async function syncUserToFirebase(user: UserRow, options?: { password?: string }) {
-  if (!isFirebaseConfigured()) {
-    throw new Error("Firebase is not configured. Set NEXT_PUBLIC_FIREBASE_* env vars.");
-  }
-
-  let firebaseUid = user.firebaseUid || null;
-  if (options?.password && !firebaseUid) {
+async function ensureFirebaseAuthUser(user: UserRow, password?: string) {
+  const auth = getAdminAuth();
+  if (user.firebaseUid) {
     try {
-      firebaseUid = (await createFirebaseAuthUser(user.email, options.password)) || firebaseUid;
-      if (firebaseUid && firebaseUid !== user.firebaseUid) {
-        await prisma.user.update({ where: { id: user.id }, data: { firebaseUid } });
-      }
+      await auth.getUser(user.firebaseUid);
+      return user.firebaseUid;
     } catch {
-      firebaseUid = user.firebaseUid || null;
+      // UID in Firestore is stale; look up by email below.
     }
   }
 
-  const db = getFirestoreDb();
+  try {
+    const existing = await auth.getUserByEmail(user.email);
+    return existing.uid;
+  } catch {
+    if (!password) return user.firebaseUid || null;
+    const created = await auth.createUser({
+      email: user.email,
+      password,
+      displayName: user.name,
+      disabled: user.status !== "ACTIVE",
+    });
+    return created.uid;
+  }
+}
+
+export async function syncUserToFirebase(user: UserRow, options?: { password?: string }) {
+  if (!isFirebaseAdminConfigured()) {
+    throw new Error("Firebase Admin is not configured. Add the service account to .env.");
+  }
+
+  let firebaseUid = user.firebaseUid || null;
+  try {
+    firebaseUid = (await ensureFirebaseAuthUser(user, options?.password)) || firebaseUid;
+    if (firebaseUid && firebaseUid !== user.firebaseUid) {
+      await prisma.user.update({ where: { id: user.id }, data: { firebaseUid } });
+    }
+  } catch {
+    firebaseUid = user.firebaseUid || null;
+  }
+
+  const db = getAdminFirestore();
   const payload = profilePayload(user, firebaseUid);
   const roleName = roleCollection(String(user.role));
 
-  await setDoc(doc(db, "users", user.id), { ...payload }, { merge: true });
-  await setDoc(doc(db, roleName, user.id), payload);
+  await db.collection("users").doc(user.id).set(payload, { merge: true });
+  await db.collection(roleName).doc(user.id).set(payload, { merge: true });
 
   for (const extra of ["admins", "teachers", "students", "visitors"]) {
     if (extra === roleName) continue;
     try {
-      await deleteDoc(doc(db, extra, user.id));
+      await db.collection(extra).doc(user.id).delete();
     } catch {
       // Role mirrors are optional cleanup.
     }
@@ -103,11 +113,21 @@ export async function syncUserToFirebase(user: UserRow, options?: { password?: s
   return payload;
 }
 
-export async function removeUserFromFirebase(user: Pick<UserRow, "id" | "role">) {
-  if (!isFirebaseConfigured()) return;
-  const db = getFirestoreDb();
-  await deleteDoc(doc(db, "users", user.id));
-  await deleteDoc(doc(db, roleCollection(String(user.role)), user.id));
+export async function removeUserFromFirebase(user: Pick<UserRow, "id" | "role" | "firebaseUid" | "email">) {
+  if (!isFirebaseAdminConfigured()) return;
+  const db = getAdminFirestore();
+  await db.collection("users").doc(user.id).delete();
+  await db.collection(roleCollection(String(user.role))).doc(user.id).delete();
+  try {
+    const auth = getAdminAuth();
+    if (user.firebaseUid) await auth.deleteUser(user.firebaseUid);
+    else if (user.email) {
+      const existing = await auth.getUserByEmail(user.email);
+      await auth.deleteUser(existing.uid);
+    }
+  } catch {
+    // Auth user may already be gone.
+  }
 }
 
 export async function syncAllUsersToFirebase() {

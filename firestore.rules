@@ -2,7 +2,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database} {
     match /{document=**} {
-      allow read, write: if true;
+      // Browser clients cannot read or write LMS data.
+      // Server access uses the Firebase Admin SDK and bypasses these rules.
+      allow read, write: if false;
     }
   }
 }

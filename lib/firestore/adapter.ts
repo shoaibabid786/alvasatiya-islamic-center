@@ -1,13 +1,6 @@
 import { randomBytes } from "crypto";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  setDoc,
-  type Firestore,
-} from "firebase/firestore";
-import { getFirestoreDb } from "@/lib/firebase";
+import type { Firestore } from "firebase-admin/firestore";
+import { getAdminFirestore } from "@/lib/firebase-admin";
 
 type Dict = Record<string, any>;
 
@@ -346,13 +339,13 @@ export class FirestoreStore {
   liveMeeting = new FirestoreModel(this, "liveMeetings");
 
   private db(): Firestore {
-    return getFirestoreDb();
+    return getAdminFirestore();
   }
 
   async load(name: string) {
     const hit = cache[name];
     if (hit && Date.now() - hit.at < CACHE_MS) return hit.rows;
-    const snap = await getDocs(collection(this.db(), name));
+    const snap = await this.db().collection(name).get();
     const rows = snap.docs.map((item) => revive({ id: item.id, ...item.data() }));
     cache[name] = { at: Date.now(), rows };
     return rows;
@@ -493,7 +486,7 @@ export class FirestoreStore {
       createdAt: plain.createdAt || now(),
       updatedAt: now(),
     });
-    await setDoc(doc(this.db(), name, id), persistable(name, row));
+    await this.db().collection(name).doc(id).set(persistable(name, row));
     this.invalidate(name);
     for (const [field, value] of Object.entries(nested)) {
       const rel = RELATIONS[name]?.[field];
@@ -511,7 +504,7 @@ export class FirestoreStore {
     if (!current) throw new Error("Record not found.");
     const { plain, nested } = splitData(args.data || {});
     const row = stripUndefined({ ...current, ...plain, id: current.id, updatedAt: now() });
-    await setDoc(doc(this.db(), name, current.id), persistable(name, row));
+    await this.db().collection(name).doc(current.id).set(persistable(name, row));
     this.invalidate(name);
     for (const [field, value] of Object.entries(nested)) {
       const rel = RELATIONS[name]?.[field];
@@ -525,7 +518,7 @@ export class FirestoreStore {
   }
 
   async remove(name: string, id: string) {
-    await deleteDoc(doc(this.db(), name, id));
+    await this.db().collection(name).doc(id).delete();
     this.invalidate(name);
   }
 

@@ -1,3 +1,4 @@
+import { getAdminFirestore, isFirebaseAdminConfigured } from "@/lib/firebase-admin";
 import { inboxEmail, notifyInbox, type InquiryEmail } from "@/lib/mail";
 
 export const INQUIRY_TYPES = ["contact", "feedback", "fatwa", "donate", "enroll", "event", "demo"] as const;
@@ -110,5 +111,19 @@ export async function sendInquiryEmail(type: InquiryType, payload: Record<string
   const email = buildInquiryEmail(type, payload);
   if (!email) return { via: "ignored" as const, title: "", fields: {}, inbox: inboxEmail() };
   await notifyInbox(email);
+  try {
+    if (isFirebaseAdminConfigured()) {
+      const db = getAdminFirestore();
+      await db.collection("inquiries").doc(`inq_${Date.now()}`).set({
+        type,
+        title: email.title,
+        fields: email.fields,
+        replyTo: email.replyTo || null,
+        createdAt: new Date().toISOString(),
+      });
+    }
+  } catch {
+    // Inbox email is already sent; Firestore copy is extra.
+  }
   return { ...email, via: "server" as const };
 }

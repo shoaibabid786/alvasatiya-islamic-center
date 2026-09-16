@@ -81,14 +81,14 @@ export async function loginWithGoogle(idToken: string) {
     }
     if (existing.status === "SUSPENDED") throw new HttpError(403, "This account is suspended. Please contact the office.");
     if (existing.status === "INACTIVE") throw new HttpError(403, "This account is inactive.");
+    const patch: Record<string, string | null> = {};
     if (!existing.profilePicture && google.photoUrl) {
-      return prisma.user.update({
-        where: { id: existing.id },
-        data: {
-          name: existing.name || google.name,
-          profilePicture: google.photoUrl,
-        },
-      });
+      patch.name = existing.name || google.name;
+      patch.profilePicture = google.photoUrl;
+    }
+    if (google.uid && google.uid !== existing.firebaseUid) patch.firebaseUid = google.uid;
+    if (Object.keys(patch).length) {
+      return prisma.user.update({ where: { id: existing.id }, data: patch });
     }
     return existing;
   }
@@ -101,6 +101,7 @@ export async function loginWithGoogle(idToken: string) {
       role: "USER",
       status: "ACTIVE",
       profilePicture: google.photoUrl,
+      firebaseUid: google.uid,
     },
   });
   await syncUserToFirebase(created);

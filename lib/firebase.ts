@@ -1,3 +1,4 @@
+/** Browser Firebase (Auth + Analytics). Server code must use `@/lib/firebase-admin`. */
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore, initializeFirestore, type Firestore } from "firebase/firestore";
 import { getAuth, type Auth } from "firebase/auth";

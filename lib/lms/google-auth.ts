@@ -1,12 +1,5 @@
 import { HttpError } from "@/lib/lms/types";
-
-type FirebaseLookupUser = {
-  localId?: string;
-  email?: string;
-  emailVerified?: boolean;
-  displayName?: string;
-  photoUrl?: string;
-};
+import { getAdminAuth } from "@/lib/firebase-admin";
 
 export type VerifiedGoogleAccount = {
   uid: string;
@@ -16,26 +9,18 @@ export type VerifiedGoogleAccount = {
 };
 
 export async function verifyGoogleIdToken(idToken: string): Promise<VerifiedGoogleAccount> {
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-  if (!apiKey) throw new HttpError(500, "Firebase is not configured.");
-
-  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ idToken }),
-  });
-  const data = (await response.json()) as { users?: FirebaseLookupUser[]; error?: { message?: string } };
-  const account = data.users?.[0];
-  if (!response.ok || !account) {
+  try {
+    const decoded = await getAdminAuth().verifyIdToken(idToken);
+    const email = decoded.email?.trim().toLowerCase();
+    if (!email) throw new HttpError(400, "Your Google account does not include an email address.");
+    return {
+      uid: decoded.uid,
+      email,
+      name: decoded.name?.trim() || email.split("@")[0],
+      photoUrl: decoded.picture || null,
+    };
+  } catch (error) {
+    if (error instanceof HttpError) throw error;
     throw new HttpError(401, "Google sign-in could not be verified.");
   }
-  const email = account.email?.trim().toLowerCase();
-  if (!email) throw new HttpError(400, "Your Google account does not include an email address.");
-
-  return {
-    uid: account.localId || email,
-    email,
-    name: account.displayName?.trim() || email.split("@")[0],
-    photoUrl: account.photoUrl || null,
-  };
 }
