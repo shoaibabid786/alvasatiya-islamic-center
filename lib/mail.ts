@@ -47,15 +47,15 @@ const FIELD_ORDER = [
 ];
 
 function env(name: string) {
-  return (process.env[name] || "").trim();
+  return (process.env[name] || "").trim().replace(/^['"]|['"]$/g, "");
 }
 
 function smtpUser() {
-  return env("SMTP_USER") || env("CONTACT_EMAIL");
+  return env("SMTP_USER") || env("CONTACT_EMAIL") || env("EMAIL_USER") || SITE.email;
 }
 
 function smtpPass() {
-  return env("SMTP_PASS").replace(/\s+/g, "");
+  return (env("SMTP_PASS") || env("GMAIL_APP_PASSWORD") || env("EMAIL_PASS")).replace(/\s+/g, "");
 }
 
 function smtpHost() {
@@ -69,11 +69,15 @@ function smtpConfigured() {
 }
 
 export function isMailConfigured() {
+  return smtpConfigured() || Boolean(inboxEmail());
+}
+
+export function isSmtpConfigured() {
   return smtpConfigured();
 }
 
 export function inboxEmail() {
-  return env("CONTACT_EMAIL") || SITE.email;
+  return env("CONTACT_EMAIL") || env("SMTP_USER") || SITE.email;
 }
 
 function fromAddress() {
@@ -116,27 +120,73 @@ export function formatUserResponse(fields: Record<string, string>) {
   return ["User response:", "", ...lines].join("\n");
 }
 
-function getTransporter() {
-  if (!smtpConfigured()) {
-    throw new Error("Email is not configured. Add SMTP_USER and SMTP_PASS (Gmail App Password) in .env, then restart npm run dev.");
-  }
+function getTransporter(port: number) {
   const user = smtpUser();
   const pass = smtpPass();
-  const port = Number(env("SMTP_PORT") || 587);
   const host = smtpHost();
-  if (host === "smtp.gmail.com") {
-    return nodemailer.createTransport({
-      service: "gmail",
-      auth: { user, pass },
-    });
-  }
   return nodemailer.createTransport({
     host,
     port,
     secure: port === 465,
     requireTLS: port === 587,
     auth: { user, pass },
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 12000,
+    family: 4,
+    tls: { minVersion: "TLSv1.2" },
   });
+}
+
+async function sendViaSmtp(input: {
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+  replyTo?: string;
+}) {
+  const preferred = Number(env("SMTP_PORT") || (process.env.VERCEL ? 465 : 587));
+  const ports = preferred === 465 ? [465, 587] : [587, 465];
+  let lastError = "Could not send email.";
+  for (const port of ports) {
+    try {
+      await getTransporter(port).sendMail({
+        from: fromAddress(),
+        to: input.to,
+        replyTo: input.replyTo,
+        subject: input.subject,
+        text: input.text,
+        html: input.html || input.text.replace(/\n/g, "<br/>"),
+      });
+      return;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : lastError;
+    }
+  }
+  throw new Error(lastError);
+}
+
+async function sendViaHttp(input: {
+  to: string;
+  subject: string;
+  text: string;
+  replyTo?: string;
+}) {
+  const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(input.to)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      _subject: input.subject,
+      _template: "box",
+      _captcha: "false",
+      email: input.replyTo || input.to,
+      message: input.text,
+    }),
+  });
+  const data = (await response.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
+  if (!response.ok || data.success === "false" || data.success === false) {
+    throw new Error(data.message || "The live server could not deliver this message.");
+  }
 }
 
 export async function sendMail(input: {
@@ -146,24 +196,27 @@ export async function sendMail(input: {
   html?: string;
   replyTo?: string;
 }) {
-  const transporter = getTransporter();
-  try {
-    await transporter.sendMail({
-      from: fromAddress(),
-      to: input.to,
-      replyTo: input.replyTo,
-      subject: input.subject,
-      text: input.text,
-      html: input.html || input.text.replace(/\n/g, "<br/>"),
-    });
-  } catch (error) {
-    const raw = error instanceof Error ? error.message : "Could not send email.";
-    if (/invalid login|username and password|badcredentials|eauth|535/i.test(raw)) {
-      throw new Error(
-        `Gmail rejected login for ${smtpUser()}. Sign into that same Gmail, turn on 2-Step Verification, create a new App Password (Security → 2-Step Verification → App passwords), and paste the 16-character code here.`,
-      );
+  let smtpError = "";
+  if (smtpConfigured()) {
+    try {
+      await sendViaSmtp(input);
+      return;
+    } catch (error) {
+      smtpError = error instanceof Error ? error.message : "SMTP failed.";
+      if (/invalid login|username and password|badcredentials|eauth|535/i.test(smtpError)) {
+        smtpError = `Gmail rejected login for ${smtpUser()}. On Vercel add SMTP_USER and SMTP_PASS (16-character App Password) in Project Settings → Environment Variables, then Redeploy.`;
+      }
     }
-    throw new Error(raw);
+  }
+  try {
+    await sendViaHttp(input);
+  } catch (error) {
+    const httpError = error instanceof Error ? error.message : "HTTP email failed.";
+    throw new Error(
+      smtpError
+        ? `${smtpError} Backup send also failed: ${httpError}`
+        : `Live email is not configured. Add SMTP_USER and SMTP_PASS in Vercel environment variables, then Redeploy. (${httpError})`,
+    );
   }
 }
 

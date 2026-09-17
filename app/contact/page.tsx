@@ -1,6 +1,6 @@
 import PageHero from "@/components/layout/PageHero";
 import ContactForm from "@/components/interactive/ContactForm";
-import { SITE } from "@/data/site";
+import { SITE, smsHref, whatsappHref } from "@/data/site";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta(
@@ -28,15 +28,10 @@ export default function Page() {
               <a className="btn btn-green !py-2" href={`tel:${SITE.localPhone}`}>
                 Call
               </a>
-              <a
-                className="btn btn-gold !py-2"
-                href={`https://wa.me/${SITE.whatsapp}`}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a className="btn btn-gold !py-2" href={whatsappHref()} target="_blank" rel="noreferrer">
                 WhatsApp
               </a>
-              <a className="btn btn-outline !py-2" href={`sms:${SITE.localPhone}`}>
+              <a className="btn btn-outline !py-2" href={smsHref()}>
                 SMS
               </a>
             </div>

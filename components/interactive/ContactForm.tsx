@@ -2,7 +2,21 @@
 
 import { useEffect, useState } from "react";
 import SuccessDialog from "@/components/ui/SuccessDialog";
+import { smsHref, whatsappHref } from "@/data/site";
 import { submitInquiry } from "@/lib/forms";
+
+function messageFromForm(form: { name: string; email: string; phone: string; subject: string; message: string }) {
+  return [
+    "Assalamu alaikum, I am contacting Alvasatiya Islamic Center.",
+    form.name && `Name: ${form.name}`,
+    form.email && `Email: ${form.email}`,
+    form.phone && `Phone: ${form.phone}`,
+    form.subject ? `Subject: ${form.subject}` : null,
+    form.message || "I would like to get in touch.",
+  ]
+    .filter((line): line is string => Boolean(line))
+    .join("\n");
+}
 
 export default function ContactForm() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
@@ -59,6 +73,19 @@ export default function ContactForm() {
         </label>
         {error ? <p className="text-sm text-red-700">{error}</p> : null}
         <button className="btn btn-gold w-full" disabled={sending}>{sending ? "Sending..." : "Send Message"}</button>
+        <div className="grid sm:grid-cols-2 gap-2">
+          <a
+            className="btn btn-green !py-2 text-center"
+            href={whatsappHref(messageFromForm(form))}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Send via WhatsApp
+          </a>
+          <a className="btn btn-outline !py-2 text-center" href={smsHref(messageFromForm(form))}>
+            Send via SMS
+          </a>
+        </div>
       </form>
       <SuccessDialog
         open={success}

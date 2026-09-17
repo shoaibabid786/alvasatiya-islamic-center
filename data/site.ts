@@ -31,3 +31,13 @@ export const SITE = {
   logo: "/images/logo.png",
   icon: "/favicon.ico",
 } as const;
+
+const CONTACT_PREFILL = "Assalamu alaikum, I would like to contact Alvasatiya Islamic Center.";
+
+export function whatsappHref(message = CONTACT_PREFILL) {
+  return `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(message)}`;
+}
+
+export function smsHref(message = CONTACT_PREFILL) {
+  return `sms:+${SITE.whatsapp}?&body=${encodeURIComponent(message)}`;
+}

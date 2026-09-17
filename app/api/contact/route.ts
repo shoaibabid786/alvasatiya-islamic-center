@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { INQUIRY_TYPES, sendInquiryEmail, type InquiryType } from "@/lib/inquiries";
+import { inboxEmail, isSmtpConfigured } from "@/lib/mail";
+
+export const runtime = "nodejs";
+export const maxDuration = 30;
 
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_PER_WINDOW = 20;
@@ -19,6 +23,13 @@ function rateLimited(ip: string) {
   recent.push(now);
   hits.set(ip, recent);
   return false;
+}
+
+export async function GET() {
+  return NextResponse.json({
+    inbox: inboxEmail(),
+    smtpConfigured: isSmtpConfigured(),
+  });
 }
 
 export async function POST(request: Request) {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Clock, Mail, MapPin, MessageCircle, MessageSquare, Phone } from "lucide-react";
-import { SITE } from "@/data/site";
+import { SITE, smsHref, whatsappHref } from "@/data/site";
 import Logo from "@/components/ui/Logo";
 
 const WEBSITE_LINKS = [
@@ -76,13 +76,13 @@ export default function Footer() {
               </li>
               <li className="flex gap-2">
                 <MessageCircle className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-                <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="hover:text-gold">
+                <a href={whatsappHref()} target="_blank" rel="noreferrer" className="hover:text-gold">
                   WhatsApp
                 </a>
               </li>
               <li className="flex gap-2">
                 <MessageSquare className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-                <a href={`sms:${SITE.localPhone}`} className="hover:text-gold">
+                <a href={smsHref()} className="hover:text-gold">
                   SMS
                 </a>
               </li>
