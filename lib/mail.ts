@@ -205,9 +205,10 @@ export async function notifyInbox(input: InquiryEmail) {
   try {
     await deliverInquiryHttp({
       subject: input.title,
-      message: text,
+      message: input.fields.Message || text,
       replyTo: input.replyTo,
       name: input.fields.Name,
+      fields: input.fields,
     });
   } catch (httpError) {
     if (!smtpConfigured()) throw httpError;

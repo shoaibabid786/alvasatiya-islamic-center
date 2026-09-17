@@ -47,13 +47,17 @@ async function postToContactApi(type: StoredForm["type"] | "demo", payload: Reco
 async function postToInboxBackup(type: StoredForm["type"] | "demo", payload: Record<string, string | number>) {
   await deliverInquiryHttp({
     subject: type === "contact" && payload.subject ? `New Contact Us message: ${payload.subject}` : `New ${type} message`,
-    message: inquiryTextFromPayload(type, payload),
+    message: String(payload.message || payload.question || inquiryTextFromPayload(type, payload)),
     replyTo: String(payload.email || ""),
     name: String(payload.name || ""),
-    extra: {
-      phone: String(payload.phone || ""),
-      formType: type,
+    fields: {
+      Name: String(payload.name || ""),
+      Email: String(payload.email || ""),
+      "Phone Number": String(payload.phone || ""),
+      Subject: String(payload.subject || payload.title || ""),
+      Message: String(payload.message || payload.question || ""),
     },
+    extra: { formType: type },
   });
   return { ok: true, via: "backup" as const, message: "JazakAllahu Khairan. Your message has been sent to Alvasatiya Islamic Center." };
 }
