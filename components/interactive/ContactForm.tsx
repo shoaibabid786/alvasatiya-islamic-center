@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import SuccessDialog from "@/components/ui/SuccessDialog";
 import DirectContactButtons from "@/components/interactive/DirectContactButtons";
 import { mailtoHref, SITE } from "@/data/site";
-import { formatContactDetails, formSubmitActionUrl } from "@/lib/contact-http";
+import { formSubmitActionUrl } from "@/lib/contact-http";
 
 function messageFromForm(form: { name: string; email: string; phone: string; subject: string; message: string }) {
   return [
@@ -24,7 +24,6 @@ export default function ContactForm({ sent = false }: { sent?: boolean }) {
   const [success, setSuccess] = useState(sent);
   const [nextUrl, setNextUrl] = useState(`${SITE.url}/contact?sent=1`);
   const draft = messageFromForm(form);
-  const details = formatContactDetails(form);
 
   useEffect(() => {
     setNextUrl(`${window.location.origin}/contact?sent=1`);
@@ -41,8 +40,6 @@ export default function ContactForm({ sent = false }: { sent?: boolean }) {
       e.preventDefault();
       return;
     }
-    const detailsInput = e.currentTarget.elements.namedItem("details") as HTMLInputElement | null;
-    if (detailsInput) detailsInput.value = details;
     fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -64,7 +61,6 @@ export default function ContactForm({ sent = false }: { sent?: boolean }) {
         <input type="hidden" name="_next" value={nextUrl} />
         <input type="hidden" name="_subject" value={form.subject ? `Website contact: ${form.subject}` : "New Contact Us message"} />
         <input type="hidden" name="_honey" value="" />
-        <input type="hidden" name="details" value={details} />
         <input
           tabIndex={-1}
           autoComplete="off"
