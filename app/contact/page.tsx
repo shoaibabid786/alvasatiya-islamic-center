@@ -10,13 +10,18 @@ export const metadata = pageMeta(
   "/contact"
 );
 
-export default function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ sent?: string }>;
+}) {
+  const params = await searchParams;
   const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(SITE.address)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
   return (
     <>
       <PageHero eyebrow="Contact Us" title="Contact Us" description="A message, a visit, or a call — we welcome sincere questions and service." />
       <section className="section-container py-12 grid lg:grid-cols-2 gap-8">
-        <ContactForm />
+        <ContactForm sent={params.sent === "1"} />
         <div className="space-y-4">
           <article className="card-surface p-6">
             <h2 className="font-semibold text-green-deep">Address</h2>

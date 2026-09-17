@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import SuccessDialog from "@/components/ui/SuccessDialog";
 import DirectContactButtons from "@/components/interactive/DirectContactButtons";
-import { mailtoHref } from "@/data/site";
-import { submitInquiry } from "@/lib/forms";
+import { mailtoHref, SITE } from "@/data/site";
+import { formatContactDetails, formSubmitActionUrl } from "@/lib/contact-http";
 
 function messageFromForm(form: { name: string; email: string; phone: string; subject: string; message: string }) {
   return [
@@ -19,37 +19,52 @@ function messageFromForm(form: { name: string; email: string; phone: string; sub
     .join("\n");
 }
 
-export default function ContactForm() {
+export default function ContactForm({ sent = false }: { sent?: boolean }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
-  const [success, setSuccess] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(sent);
+  const [nextUrl, setNextUrl] = useState(`${SITE.url}/contact?sent=1`);
   const draft = messageFromForm(form);
+  const details = formatContactDetails(form);
+
+  useEffect(() => {
+    setNextUrl(`${window.location.origin}/contact?sent=1`);
+  }, []);
 
   useEffect(() => {
     if (!success) return;
-    const t = setTimeout(() => setSuccess(false), 5000);
+    const t = setTimeout(() => setSuccess(false), 8000);
     return () => clearTimeout(t);
   }, [success]);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setSending(true);
-    setError("");
-    try {
-      await submitInquiry("contact", form);
-      setSuccess(true);
-      setForm({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not send your message.");
-    } finally {
-      setSending(false);
+  function submit(e: React.FormEvent<HTMLFormElement>) {
+    if (form.website.trim()) {
+      e.preventDefault();
+      return;
     }
+    const detailsInput = e.currentTarget.elements.namedItem("details") as HTMLInputElement | null;
+    if (detailsInput) detailsInput.value = details;
+    fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "contact", ...form, clientDelivered: true }),
+      keepalive: true,
+    }).catch(() => {});
   }
 
   return (
     <>
-      <form onSubmit={submit} className="card-surface p-6 space-y-3">
+      <form
+        action={formSubmitActionUrl()}
+        method="POST"
+        acceptCharset="UTF-8"
+        onSubmit={submit}
+        className="card-surface p-6 space-y-3"
+      >
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_next" value={nextUrl} />
+        <input type="hidden" name="_subject" value={form.subject ? `Website contact: ${form.subject}` : "New Contact Us message"} />
+        <input type="hidden" name="_honey" value="" />
+        <input type="hidden" name="details" value={details} />
         <input
           tabIndex={-1}
           autoComplete="off"
@@ -73,15 +88,10 @@ export default function ContactForm() {
         <label className="block text-sm font-semibold text-green-deep">Message
           <textarea required name="message" className="mt-1" rows={6} placeholder="Type your message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
         </label>
-        {error ? (
-          <div className="space-y-2">
-            <p className="text-sm text-red-700">{error}</p>
-            <a className="text-sm text-green-deep underline" href={mailtoHref(form.subject || "Contact", draft)}>
-              Open in your email app
-            </a>
-          </div>
-        ) : null}
-        <button className="btn btn-gold w-full" disabled={sending}>{sending ? "Sending..." : "Send Message"}</button>
+        <a className="text-sm text-green-deep underline" href={mailtoHref(form.subject || "Contact", draft)}>
+          Or open in your email app
+        </a>
+        <button className="btn btn-gold w-full" type="submit">Send Message</button>
         <p className="text-xs text-muted text-center">Or send this same message from your phone:</p>
         <DirectContactButtons message={draft} showCall={false} className="grid sm:grid-cols-2 gap-2" />
       </form>

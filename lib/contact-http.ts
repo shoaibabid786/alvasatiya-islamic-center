@@ -11,9 +11,9 @@ function asRecord(value: unknown) {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
 }
 
-function formSubmitUrl(kind: "ajax" | "form") {
+export function formSubmitActionUrl() {
   const id = (process.env.NEXT_PUBLIC_FORMSUBMIT_ID || FORMSUBMIT_ID).trim();
-  return kind === "ajax" ? `https://formsubmit.co/ajax/${id}` : `https://formsubmit.co/${id}`;
+  return `https://formsubmit.co/${id}`;
 }
 
 function filled(value: unknown) {
@@ -95,7 +95,7 @@ export async function deliverInquiryHttp(input: {
     if (value) encoded.set(key, value);
   }
 
-  const ajax = await fetch(formSubmitUrl("ajax"), {
+  const ajax = await fetch(`${formSubmitActionUrl()}`.replace("https://formsubmit.co/", "https://formsubmit.co/ajax/"), {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -108,7 +108,7 @@ export async function deliverInquiryHttp(input: {
   if (ajax.ok && ajaxData.success !== false && ajaxData.success !== "false") return;
   if (/activat/i.test(ajaxMessage)) return;
 
-  const fallback = await fetch(formSubmitUrl("form"), {
+  const fallback = await fetch(formSubmitActionUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
     body: encoded.toString(),
