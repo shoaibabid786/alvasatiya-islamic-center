@@ -59,19 +59,19 @@ export default function ContactForm() {
           onChange={(e) => setForm({ ...form, website: e.target.value })}
         />
         <label className="block text-sm font-semibold text-green-deep">Name
-          <input required className="mt-1" placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <input required name="name" autoComplete="name" className="mt-1" placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         </label>
         <label className="block text-sm font-semibold text-green-deep">Email
-          <input required className="mt-1" type="email" placeholder="Your email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <input required name="email" autoComplete="email" className="mt-1" type="email" placeholder="Your email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </label>
         <label className="block text-sm font-semibold text-green-deep">Phone / WhatsApp number
-          <input className="mt-1" placeholder="e.g. 0300 4840308" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <input name="phone" autoComplete="tel" className="mt-1" placeholder="e.g. 0300 4840308" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
         </label>
         <label className="block text-sm font-semibold text-green-deep">Subject
-          <input required className="mt-1" placeholder="Subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} />
+          <input required name="subject" className="mt-1" placeholder="Subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} />
         </label>
         <label className="block text-sm font-semibold text-green-deep">Message
-          <textarea required className="mt-1" rows={6} placeholder="Type your message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
+          <textarea required name="message" className="mt-1" rows={6} placeholder="Type your message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
         </label>
         {error ? (
           <div className="space-y-2">

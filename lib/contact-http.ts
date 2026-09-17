@@ -17,9 +17,60 @@ function formSubmitUrl(kind: "ajax" | "form") {
 }
 
 function filled(value: unknown) {
-  const text = String(value ?? "").trim();
-  if (!text || text === "Not provided") return "";
-  return text;
+  return String(value ?? "").trim();
+}
+
+export function formatContactDetails(input: {
+  name?: string;
+  email?: string;
+  phone?: string;
+  subject?: string;
+  message?: string;
+  extra?: Record<string, string>;
+}) {
+  const lines = [
+    `Name: ${filled(input.name) || "Not provided"}`,
+    `Email: ${filled(input.email) || "Not provided"}`,
+    `Phone: ${filled(input.phone) || "Not provided"}`,
+    `Subject: ${filled(input.subject) || "Not provided"}`,
+    "",
+    "Message:",
+    filled(input.message) || "Not provided",
+  ];
+  if (input.extra) {
+    for (const [key, value] of Object.entries(input.extra)) {
+      const text = filled(value);
+      if (!text) continue;
+      lines.push(`${key}: ${text}`);
+    }
+  }
+  return lines.join("\n");
+}
+
+function simplePayload(input: {
+  subject: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  visitorSubject?: string;
+  message: string;
+}) {
+  const details = formatContactDetails({
+    name: input.name,
+    email: input.email,
+    phone: input.phone,
+    subject: input.visitorSubject,
+    message: input.message,
+  });
+  return {
+    _subject: input.subject || "New Contact Us message",
+    _captcha: "false",
+    name: filled(input.name) || "Website visitor",
+    email: filled(input.email),
+    phone: filled(input.phone),
+    subject: filled(input.visitorSubject),
+    message: details,
+  };
 }
 
 export async function deliverInquiryHttp(input: {
@@ -30,86 +81,40 @@ export async function deliverInquiryHttp(input: {
   extra?: Record<string, string>;
   fields?: Record<string, string>;
 }) {
-  const payload: Record<string, string> = {
-    _subject: input.subject || "New website message",
-    _template: "table",
-    _captcha: "false",
-  };
+  const payload = simplePayload({
+    subject: input.subject,
+    name: filled(input.fields?.Name) || filled(input.name),
+    email: filled(input.fields?.Email) || filled(input.replyTo),
+    phone: filled(input.fields?.["Phone Number"]) || filled(input.fields?.Phone) || filled(input.extra?.phone),
+    visitorSubject: filled(input.fields?.Subject) || filled(input.extra?.subject),
+    message: filled(input.fields?.Message) || filled(input.extra?.message) || filled(input.message),
+  });
 
-  const visitorName = filled(input.fields?.Name) || filled(input.name) || "Website visitor";
-  const visitorEmail = filled(input.fields?.Email) || filled(input.replyTo);
-  const visitorPhone = filled(input.fields?.["Phone Number"]) || filled(input.fields?.Phone) || filled(input.extra?.phone);
-  const visitorSubject = filled(input.fields?.Subject) || filled(input.extra?.subject);
-  const visitorMessage =
-    filled(input.fields?.Message) ||
-    filled(input.extra?.message) ||
-    filled(input.message);
-
-  payload.name = visitorName;
-  payload.Name = visitorName;
-  if (visitorEmail) {
-    payload.email = visitorEmail;
-    payload.Email = visitorEmail;
-    payload._replyto = visitorEmail;
-  }
-  if (visitorPhone) payload.Phone = visitorPhone;
-  if (visitorSubject) payload.Subject = visitorSubject;
-  payload.message = visitorMessage || input.message;
-  payload.Message = payload.message;
-
-  if (input.fields) {
-    for (const [key, value] of Object.entries(input.fields)) {
-      const text = filled(value);
-      if (!text) continue;
-      if (["Name", "Email", "Message", "Phone Number", "Subject"].includes(key)) continue;
-      payload[key] = text;
-    }
-  }
-  if (input.extra) {
-    for (const [key, value] of Object.entries(input.extra)) {
-      const text = filled(value);
-      if (!text || key === "phone" || key === "message" || key === "subject") continue;
-      if (payload[key]) continue;
-      payload[key] = text;
-    }
+  const encoded = new URLSearchParams();
+  for (const [key, value] of Object.entries(payload)) {
+    if (value) encoded.set(key, value);
   }
 
   const ajax = await fetch(formSubmitUrl("ajax"), {
     method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Accept: "application/json",
+    },
+    body: encoded.toString(),
   });
   const ajaxData = asRecord(await ajax.json().catch(() => ({})));
   const ajaxMessage = String(ajaxData.message || "");
   if (ajax.ok && ajaxData.success !== false && ajaxData.success !== "false") return;
   if (/activat/i.test(ajaxMessage)) return;
 
-  const body = new URLSearchParams();
-  for (const [key, value] of Object.entries(payload)) body.set(key, value);
   const fallback = await fetch(formSubmitUrl("form"), {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Accept: "application/json",
-    },
-    body: body.toString(),
+    headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
+    body: encoded.toString(),
     redirect: "follow",
   });
   if (fallback.ok) return;
 
   throw new Error(ajaxMessage || "The live server could not deliver this message to email.");
-}
-
-export function inquiryTextFromPayload(type: string, payload: Record<string, string | number>) {
-  const lines = [
-    `Form type: ${type}`,
-    `Received at: ${new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" })}`,
-  ];
-  for (const [key, value] of Object.entries(payload)) {
-    if (key === "website" || key === "company" || key === "type") continue;
-    const text = String(value ?? "").trim();
-    if (!text) continue;
-    lines.push(`${key}: ${text}`);
-  }
-  return ["User response:", "", ...lines].join("\n");
 }

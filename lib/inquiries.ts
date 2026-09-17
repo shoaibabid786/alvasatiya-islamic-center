@@ -14,7 +14,7 @@ const SUBJECTS: Record<InquiryType, string> = {
   demo: "New free demo request",
 };
 
-const SKIP = new Set(["type", "website", "company"]);
+const SKIP = new Set(["type", "website", "company", "clientDelivered"]);
 
 function asText(value: unknown, max = 8000) {
   return String(value ?? "")
@@ -111,11 +111,14 @@ export async function sendInquiryEmail(type: InquiryType, payload: Record<string
   const email = buildInquiryEmail(type, payload);
   if (!email) return { via: "ignored" as const, title: "", fields: {}, inbox: inboxEmail() };
 
+  const alreadyDelivered = payload.clientDelivered === true || payload.clientDelivered === "true";
   let mailError: Error | null = null;
-  try {
-    await notifyInbox(email);
-  } catch (error) {
-    mailError = error instanceof Error ? error : new Error("Could not send your message.");
+  if (!alreadyDelivered) {
+    try {
+      await notifyInbox(email);
+    } catch (error) {
+      mailError = error instanceof Error ? error : new Error("Could not send your message.");
+    }
   }
 
   try {
@@ -127,7 +130,7 @@ export async function sendInquiryEmail(type: InquiryType, payload: Record<string
         fields: email.fields,
         replyTo: email.replyTo || null,
         createdAt: new Date().toISOString(),
-        delivered: !mailError,
+        delivered: alreadyDelivered || !mailError,
       });
     }
   } catch {
@@ -135,5 +138,5 @@ export async function sendInquiryEmail(type: InquiryType, payload: Record<string
   }
 
   if (mailError) throw mailError;
-  return { ...email, via: "server" as const };
+  return { ...email, via: alreadyDelivered ? ("client" as const) : ("server" as const) };
 }

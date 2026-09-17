@@ -1,5 +1,5 @@
 import { SITE } from "@/data/site";
-import { deliverInquiryHttp, inquiryTextFromPayload } from "@/lib/contact-http";
+import { deliverInquiryHttp } from "@/lib/contact-http";
 
 export type StoredForm = {
   id: string;
@@ -24,14 +24,34 @@ export function saveForm(type: StoredForm["type"], payload: Record<string, strin
   return entry;
 }
 
-async function postToContactApi(type: StoredForm["type"] | "demo", payload: Record<string, string | number>) {
+function visitorFields(type: StoredForm["type"] | "demo", payload: Record<string, string | number>) {
+  return {
+    subject: type === "contact" && payload.subject ? `New Contact Us message: ${payload.subject}` : `New ${type} message`,
+    message: String(payload.message || payload.question || ""),
+    replyTo: String(payload.email || ""),
+    name: String(payload.name || ""),
+    extra: {
+      phone: String(payload.phone || ""),
+      subject: String(payload.subject || payload.title || ""),
+    },
+    fields: {
+      Name: String(payload.name || ""),
+      Email: String(payload.email || ""),
+      "Phone Number": String(payload.phone || ""),
+      Subject: String(payload.subject || payload.title || ""),
+      Message: String(payload.message || payload.question || ""),
+    },
+  };
+}
+
+async function postToContactApi(type: StoredForm["type"] | "demo", payload: Record<string, string | number>, clientDelivered: boolean) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
   try {
     const response = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type, ...payload }),
+      body: JSON.stringify({ type, ...payload, clientDelivered }),
       signal: controller.signal,
     });
     const data = await response.json().catch(() => ({}));
@@ -44,37 +64,25 @@ async function postToContactApi(type: StoredForm["type"] | "demo", payload: Reco
   }
 }
 
-async function postToInboxBackup(type: StoredForm["type"] | "demo", payload: Record<string, string | number>) {
-  await deliverInquiryHttp({
-    subject: type === "contact" && payload.subject ? `New Contact Us message: ${payload.subject}` : `New ${type} message`,
-    message: String(payload.message || payload.question || inquiryTextFromPayload(type, payload)),
-    replyTo: String(payload.email || ""),
-    name: String(payload.name || ""),
-    fields: {
-      Name: String(payload.name || ""),
-      Email: String(payload.email || ""),
-      "Phone Number": String(payload.phone || ""),
-      Subject: String(payload.subject || payload.title || ""),
-      Message: String(payload.message || payload.question || ""),
-    },
-    extra: { formType: type },
-  });
-  return { ok: true, via: "backup" as const, message: "JazakAllahu Khairan. Your message has been sent to Alvasatiya Islamic Center." };
-}
-
 export async function submitInquiry(type: StoredForm["type"] | "demo", payload: Record<string, string | number>) {
+  let delivered = false;
   try {
-    const data = await postToContactApi(type, payload);
+    await deliverInquiryHttp(visitorFields(type, payload));
+    delivered = true;
+  } catch {
+    delivered = false;
+  }
+
+  try {
+    const data = await postToContactApi(type, payload, delivered);
     if (type !== "demo") saveForm(type, payload);
     return data;
   } catch (error) {
-    try {
-      const data = await postToInboxBackup(type, payload);
+    if (delivered) {
       if (type !== "demo") saveForm(type, payload);
-      return data;
-    } catch {
-      const detail = error instanceof Error ? error.message : "Could not send your message.";
-      throw new Error(`${detail} Please WhatsApp ${SITE.localPhone} or email ${SITE.email}.`);
+      return { ok: true, via: "backup" as const, message: "JazakAllahu Khairan. Your message has been sent to Alvasatiya Islamic Center." };
     }
+    const detail = error instanceof Error ? error.message : "Could not send your message.";
+    throw new Error(`${detail} Please WhatsApp ${SITE.localPhone} or email ${SITE.email}.`);
   }
 }
