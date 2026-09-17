@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { SITE } from "@/data/site";
+import { deliverInquiryHttp } from "@/lib/contact-http";
 
 export type InquiryEmail = {
   title: string;
@@ -69,7 +70,7 @@ function smtpConfigured() {
 }
 
 export function isMailConfigured() {
-  return smtpConfigured() || Boolean(inboxEmail());
+  return smtpConfigured();
 }
 
 export function isSmtpConfigured() {
@@ -130,11 +131,10 @@ function getTransporter(port: number) {
     secure: port === 465,
     requireTLS: port === 587,
     auth: { user, pass },
-    connectionTimeout: 8000,
-    greetingTimeout: 8000,
-    socketTimeout: 12000,
-    family: 4,
-    tls: { minVersion: "TLSv1.2" },
+    connectionTimeout: 6000,
+    greetingTimeout: 6000,
+    socketTimeout: 10000,
+    tls: { minVersion: "TLSv1.2", servername: host },
   });
 }
 
@@ -166,29 +166,6 @@ async function sendViaSmtp(input: {
   throw new Error(lastError);
 }
 
-async function sendViaHttp(input: {
-  to: string;
-  subject: string;
-  text: string;
-  replyTo?: string;
-}) {
-  const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(input.to)}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({
-      _subject: input.subject,
-      _template: "box",
-      _captcha: "false",
-      email: input.replyTo || input.to,
-      message: input.text,
-    }),
-  });
-  const data = (await response.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
-  if (!response.ok || data.success === "false" || data.success === false) {
-    throw new Error(data.message || "The live server could not deliver this message.");
-  }
-}
-
 export async function sendMail(input: {
   to: string;
   subject: string;
@@ -196,27 +173,19 @@ export async function sendMail(input: {
   html?: string;
   replyTo?: string;
 }) {
-  let smtpError = "";
-  if (smtpConfigured()) {
-    try {
-      await sendViaSmtp(input);
-      return;
-    } catch (error) {
-      smtpError = error instanceof Error ? error.message : "SMTP failed.";
-      if (/invalid login|username and password|badcredentials|eauth|535/i.test(smtpError)) {
-        smtpError = `Gmail rejected login for ${smtpUser()}. On Vercel add SMTP_USER and SMTP_PASS (16-character App Password) in Project Settings → Environment Variables, then Redeploy.`;
-      }
-    }
+  if (!smtpConfigured()) {
+    throw new Error("Email is not configured. Add SMTP_USER and SMTP_PASS (Gmail App Password) in Vercel Environment Variables, then Redeploy.");
   }
   try {
-    await sendViaHttp(input);
+    await sendViaSmtp(input);
   } catch (error) {
-    const httpError = error instanceof Error ? error.message : "HTTP email failed.";
-    throw new Error(
-      smtpError
-        ? `${smtpError} Backup send also failed: ${httpError}`
-        : `Live email is not configured. Add SMTP_USER and SMTP_PASS in Vercel environment variables, then Redeploy. (${httpError})`,
-    );
+    const raw = error instanceof Error ? error.message : "Could not send email.";
+    if (/invalid login|username and password|badcredentials|eauth|535/i.test(raw)) {
+      throw new Error(
+        `Gmail rejected login for ${smtpUser()}. On Vercel add SMTP_USER and SMTP_PASS (16-character App Password) in Project Settings → Environment Variables, then Redeploy.`,
+      );
+    }
+    throw new Error(raw);
   }
 }
 
@@ -228,5 +197,20 @@ export async function notifyInbox(input: InquiryEmail) {
       <p style="white-space:pre-wrap;margin:0">${escapeHtml(text)}</p>
     </div>
   `;
-  await sendMail({ to, subject: input.title, text, html, replyTo: input.replyTo });
+  const onVercel = Boolean(process.env.VERCEL);
+  if (smtpConfigured() && !onVercel) {
+    await sendViaSmtp({ to, subject: input.title, text, html, replyTo: input.replyTo });
+    return;
+  }
+  try {
+    await deliverInquiryHttp({
+      subject: input.title,
+      message: text,
+      replyTo: input.replyTo,
+      name: input.fields.Name,
+    });
+  } catch (httpError) {
+    if (!smtpConfigured()) throw httpError;
+    await sendViaSmtp({ to, subject: input.title, text, html, replyTo: input.replyTo });
+  }
 }

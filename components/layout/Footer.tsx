@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Clock, Mail, MapPin, MessageCircle, MessageSquare, Phone } from "lucide-react";
-import { SITE, smsHref, whatsappHref } from "@/data/site";
+import { SITE, smsHref, telHref, whatsappHref } from "@/data/site";
 import Logo from "@/components/ui/Logo";
 
 const WEBSITE_LINKS = [
@@ -70,8 +70,8 @@ export default function Footer() {
               </li>
               <li className="flex gap-2">
                 <Phone className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-                <a href={`tel:${SITE.localPhone}`} className="hover:text-gold">
-                  {SITE.localPhone}
+                <a href={telHref()} className="hover:text-gold">
+                  {SITE.phone}
                 </a>
               </li>
               <li className="flex gap-2">

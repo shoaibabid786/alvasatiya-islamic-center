@@ -34,10 +34,31 @@ export const SITE = {
 
 const CONTACT_PREFILL = "Assalamu alaikum, I would like to contact Alvasatiya Islamic Center.";
 
+export function telHref() {
+  return `tel:+${SITE.whatsapp}`;
+}
+
+export function mailtoHref(subject?: string, body?: string) {
+  const params = new URLSearchParams();
+  if (subject) params.set("subject", subject);
+  if (body) params.set("body", body);
+  const query = params.toString();
+  return `mailto:${SITE.email}${query ? `?${query}` : ""}`;
+}
+
 export function whatsappHref(message = CONTACT_PREFILL) {
   return `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 
 export function smsHref(message = CONTACT_PREFILL) {
-  return `sms:+${SITE.whatsapp}?&body=${encodeURIComponent(message)}`;
+  const body = encodeURIComponent(message);
+  return `sms:+${SITE.whatsapp}?body=${body}&body=${body}`;
+}
+
+export function openSms(message = CONTACT_PREFILL) {
+  if (typeof window === "undefined") return;
+  const body = encodeURIComponent(message);
+  const phone = `+${SITE.whatsapp}`;
+  const ios = /iPad|iPhone|iPod/i.test(window.navigator.userAgent);
+  window.location.href = ios ? `sms:${phone}&body=${body}` : `sms:${phone}?body=${body}`;
 }

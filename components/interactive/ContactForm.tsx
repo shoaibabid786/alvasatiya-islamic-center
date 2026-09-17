@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from "react";
 import SuccessDialog from "@/components/ui/SuccessDialog";
-import { smsHref, whatsappHref } from "@/data/site";
+import DirectContactButtons from "@/components/interactive/DirectContactButtons";
+import { mailtoHref } from "@/data/site";
 import { submitInquiry } from "@/lib/forms";
 
 function messageFromForm(form: { name: string; email: string; phone: string; subject: string; message: string }) {
   return [
     "Assalamu alaikum, I am contacting Alvasatiya Islamic Center.",
-    form.name && `Name: ${form.name}`,
-    form.email && `Email: ${form.email}`,
-    form.phone && `Phone: ${form.phone}`,
+    form.name ? `Name: ${form.name}` : null,
+    form.email ? `Email: ${form.email}` : null,
+    form.phone ? `Phone: ${form.phone}` : null,
     form.subject ? `Subject: ${form.subject}` : null,
     form.message || "I would like to get in touch.",
   ]
@@ -23,6 +24,7 @@ export default function ContactForm() {
   const [success, setSuccess] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const draft = messageFromForm(form);
 
   useEffect(() => {
     if (!success) return;
@@ -71,21 +73,17 @@ export default function ContactForm() {
         <label className="block text-sm font-semibold text-green-deep">Message
           <textarea required className="mt-1" rows={6} placeholder="Type your message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
         </label>
-        {error ? <p className="text-sm text-red-700">{error}</p> : null}
+        {error ? (
+          <div className="space-y-2">
+            <p className="text-sm text-red-700">{error}</p>
+            <a className="text-sm text-green-deep underline" href={mailtoHref(form.subject || "Contact", draft)}>
+              Open in your email app
+            </a>
+          </div>
+        ) : null}
         <button className="btn btn-gold w-full" disabled={sending}>{sending ? "Sending..." : "Send Message"}</button>
-        <div className="grid sm:grid-cols-2 gap-2">
-          <a
-            className="btn btn-green !py-2 text-center"
-            href={whatsappHref(messageFromForm(form))}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Send via WhatsApp
-          </a>
-          <a className="btn btn-outline !py-2 text-center" href={smsHref(messageFromForm(form))}>
-            Send via SMS
-          </a>
-        </div>
+        <p className="text-xs text-muted text-center">Or send this same message from your phone:</p>
+        <DirectContactButtons message={draft} showCall={false} className="grid sm:grid-cols-2 gap-2" />
       </form>
       <SuccessDialog
         open={success}

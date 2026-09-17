@@ -110,7 +110,14 @@ export function buildInquiryEmail(type: InquiryType, payload: Record<string, unk
 export async function sendInquiryEmail(type: InquiryType, payload: Record<string, unknown>) {
   const email = buildInquiryEmail(type, payload);
   if (!email) return { via: "ignored" as const, title: "", fields: {}, inbox: inboxEmail() };
-  await notifyInbox(email);
+
+  let mailError: Error | null = null;
+  try {
+    await notifyInbox(email);
+  } catch (error) {
+    mailError = error instanceof Error ? error : new Error("Could not send your message.");
+  }
+
   try {
     if (isFirebaseAdminConfigured()) {
       const db = getAdminFirestore();
@@ -120,10 +127,13 @@ export async function sendInquiryEmail(type: InquiryType, payload: Record<string
         fields: email.fields,
         replyTo: email.replyTo || null,
         createdAt: new Date().toISOString(),
+        delivered: !mailError,
       });
     }
   } catch {
-    // Inbox email is already sent; Firestore copy is extra.
+    // Inbox email is the main path; Firestore copy is extra.
   }
+
+  if (mailError) throw mailError;
   return { ...email, via: "server" as const };
 }

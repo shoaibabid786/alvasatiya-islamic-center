@@ -1,6 +1,7 @@
 import PageHero from "@/components/layout/PageHero";
 import ContactForm from "@/components/interactive/ContactForm";
-import { SITE, smsHref, whatsappHref } from "@/data/site";
+import DirectContactButtons from "@/components/interactive/DirectContactButtons";
+import { SITE, mailtoHref } from "@/data/site";
 import { pageMeta } from "@/lib/seo";
 
 export const metadata = pageMeta(
@@ -23,20 +24,10 @@ export default function Page() {
           </article>
           <article className="card-surface p-6">
             <h2 className="font-semibold text-green-deep">Phone, WhatsApp &amp; SMS</h2>
-            <p className="text-muted mt-2">{SITE.localPhone}</p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <a className="btn btn-green !py-2" href={`tel:${SITE.localPhone}`}>
-                Call
-              </a>
-              <a className="btn btn-gold !py-2" href={whatsappHref()} target="_blank" rel="noreferrer">
-                WhatsApp
-              </a>
-              <a className="btn btn-outline !py-2" href={smsHref()}>
-                SMS
-              </a>
-            </div>
+            <p className="text-muted mt-2">{SITE.phone}</p>
+            <DirectContactButtons />
             <p className="mt-4">
-              <a className="text-green-deep underline" href={`mailto:${SITE.email}`}>
+              <a className="text-green-deep underline" href={mailtoHref()}>
                 {SITE.email}
               </a>
             </p>
