@@ -26,6 +26,13 @@ export const teacherCreateSchema = z.object({
   status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]).optional(),
 });
 
+export const adminCreateSchema = z.object({
+  name: z.string().trim().min(2, "Full name is required"),
+  email: z.string().trim().email("Valid email is required"),
+  phone: z.string().trim().optional().or(z.literal("")),
+  password: passwordSchema,
+});
+
 export const teacherUpdateSchema = z.object({
   name: z.string().trim().min(2).optional(),
   email: z.string().trim().email().optional(),

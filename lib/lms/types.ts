@@ -78,6 +78,8 @@ export function assertAllowedFile(name: string, size: number) {
   if (size > MAX_UPLOAD_BYTES) throw new HttpError(400, "File too large");
 }
 
+export const PRIMARY_ADMIN_EMAIL = "alvasatiya4@gmail.com";
+
 export type Role = "ADMIN" | "TEACHER" | "STUDENT" | "USER";
 export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
 export type ClassStatus = "ACTIVE" | "INACTIVE" | "COMPLETED";

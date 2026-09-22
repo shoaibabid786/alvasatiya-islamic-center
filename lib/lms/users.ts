@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { hashPassword, randomToken, toPublicUser, verifyPassword } from "@/lib/auth";
-import { HttpError, generateStudentCode, type PublicUser, type Role } from "@/lib/lms/types";
+import { HttpError, PRIMARY_ADMIN_EMAIL, generateStudentCode, type PublicUser, type Role } from "@/lib/lms/types";
 import { verifyGoogleIdToken } from "@/lib/lms/google-auth";
 import {
+  adminCreateSchema,
   changePasswordSchema,
   profileSchema,
   studentCreateSchema,
@@ -155,6 +156,11 @@ export async function createTeacher(body: unknown) {
   return createUserAccount({ ...data, role: "TEACHER" });
 }
 
+export async function createAdmin(body: unknown) {
+  const data = adminCreateSchema.parse(body);
+  return createUserAccount({ ...data, role: "ADMIN" });
+}
+
 export async function updateTeacher(id: string, body: unknown) {
   const data = teacherUpdateSchema.parse(body);
   const user = await prisma.user.findUnique({ where: { id } });
@@ -187,11 +193,19 @@ export async function updateTeacher(id: string, body: unknown) {
 
 export async function deleteUser(id: string, role: Role) {
   const user = await prisma.user.findUnique({ where: { id } });
-  if (!user || user.role !== role) throw new HttpError(404, `${role === "TEACHER" ? "Teacher" : "Student"} not found.`);
-  if (user.role === "ADMIN") throw new HttpError(400, "Admin accounts cannot be deleted here.");
+  if (!user || user.role !== role) {
+    throw new HttpError(404, `${role === "ADMIN" ? "Admin" : role === "TEACHER" ? "Teacher" : "Student"} not found.`);
+  }
+  if (user.role === "ADMIN" && normalizeEmail(user.email) === PRIMARY_ADMIN_EMAIL) {
+    throw new HttpError(400, "The primary administrator cannot be deleted.");
+  }
   await prisma.user.delete({ where: { id } });
   await removeUserFromFirebase(user);
-  return { ok: true, message: role === "TEACHER" ? "Teacher deleted successfully" : "Student deleted successfully" };
+  return {
+    ok: true,
+    message:
+      role === "ADMIN" ? "Administrator deleted successfully" : role === "TEACHER" ? "Teacher deleted successfully" : "Student deleted successfully",
+  };
 }
 
 export async function setUserStatus(id: string, status: string) {

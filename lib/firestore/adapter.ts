@@ -1,6 +1,5 @@
 import { randomBytes } from "crypto";
-import type { Firestore } from "firebase-admin/firestore";
-import { getAdminFirestore } from "@/lib/firebase-admin";
+import { listDocuments, removeDocument, writeDocument } from "@/lib/firestore/access";
 
 type Dict = Record<string, any>;
 
@@ -338,15 +337,10 @@ export class FirestoreStore {
   announcement = new FirestoreModel(this, "announcements");
   liveMeeting = new FirestoreModel(this, "liveMeetings");
 
-  private db(): Firestore {
-    return getAdminFirestore();
-  }
-
   async load(name: string) {
     const hit = cache[name];
     if (hit && Date.now() - hit.at < CACHE_MS) return hit.rows;
-    const snap = await this.db().collection(name).get();
-    const rows = snap.docs.map((item) => revive({ id: item.id, ...item.data() }));
+    const rows = (await listDocuments(name)).map((item) => revive(item));
     cache[name] = { at: Date.now(), rows };
     return rows;
   }
@@ -486,7 +480,7 @@ export class FirestoreStore {
       createdAt: plain.createdAt || now(),
       updatedAt: now(),
     });
-    await this.db().collection(name).doc(id).set(persistable(name, row));
+    await writeDocument(name, id, persistable(name, row));
     this.invalidate(name);
     for (const [field, value] of Object.entries(nested)) {
       const rel = RELATIONS[name]?.[field];
@@ -504,7 +498,7 @@ export class FirestoreStore {
     if (!current) throw new Error("Record not found.");
     const { plain, nested } = splitData(args.data || {});
     const row = stripUndefined({ ...current, ...plain, id: current.id, updatedAt: now() });
-    await this.db().collection(name).doc(current.id).set(persistable(name, row));
+    await writeDocument(name, current.id, persistable(name, row));
     this.invalidate(name);
     for (const [field, value] of Object.entries(nested)) {
       const rel = RELATIONS[name]?.[field];
@@ -518,7 +512,7 @@ export class FirestoreStore {
   }
 
   async remove(name: string, id: string) {
-    await this.db().collection(name).doc(id).delete();
+    await removeDocument(name, id);
     this.invalidate(name);
   }
 
