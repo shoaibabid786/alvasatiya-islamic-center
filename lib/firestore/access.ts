@@ -2,7 +2,7 @@ import { getAdminFirestore } from "@/lib/firebase-admin";
 
 type Dict = Record<string, any>;
 
-let mode: "admin" | "rest" | null = null;
+let mode: "admin" | "rest" = "rest";
 
 function projectId() {
   return process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || "alvasatiya-islamic-center";
@@ -99,10 +99,9 @@ async function removeViaRest(name: string, id: string) {
 }
 
 export async function listDocuments(name: string) {
-  if (mode !== "rest") {
+  if (mode === "admin") {
     try {
       const snap = await getAdminFirestore().collection(name).get();
-      mode = "admin";
       return snap.docs.map((item) => ({ id: item.id, ...item.data() }));
     } catch (error) {
       if (!isCredError(error)) throw error;
@@ -113,10 +112,9 @@ export async function listDocuments(name: string) {
 }
 
 export async function writeDocument(name: string, id: string, data: Dict) {
-  if (mode !== "rest") {
+  if (mode === "admin") {
     try {
       await getAdminFirestore().collection(name).doc(id).set(data);
-      mode = "admin";
       return;
     } catch (error) {
       if (!isCredError(error)) throw error;
@@ -127,10 +125,9 @@ export async function writeDocument(name: string, id: string, data: Dict) {
 }
 
 export async function removeDocument(name: string, id: string) {
-  if (mode !== "rest") {
+  if (mode === "admin") {
     try {
       await getAdminFirestore().collection(name).doc(id).delete();
-      mode = "admin";
       return;
     } catch (error) {
       if (!isCredError(error)) throw error;

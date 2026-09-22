@@ -20,6 +20,9 @@ function readableError(error: unknown) {
     if (messages.length) return messages.join(" ");
   }
   if (error instanceof Error && error.message && !error.message.includes("invalid_format")) {
+    if (/UNAUTHENTICATED|invalid_grant|invalid jwt|OAuth2/i.test(error.message)) {
+      return "Could not sign in. Please try again.";
+    }
     return error.message;
   }
   return "Please check the form and try again.";

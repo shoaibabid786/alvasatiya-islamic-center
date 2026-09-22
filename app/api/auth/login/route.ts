@@ -4,11 +4,9 @@ import { jsonError } from "@/lib/lms/http";
 import { loginSchema } from "@/lib/lms/schemas";
 import { dashboardPath } from "@/lib/lms/types";
 import { loginAccount } from "@/lib/lms/users";
-import { ensureDemoAccounts } from "@/lib/lms/ensure-demo-accounts";
 
 export async function POST(request: Request) {
   try {
-    void ensureDemoAccounts();
     const body = await request.json();
     const data = loginSchema.parse(body);
     const user = await loginAccount(data.email, data.password);
