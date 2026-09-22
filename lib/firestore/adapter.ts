@@ -340,7 +340,7 @@ export class FirestoreStore {
   async load(name: string) {
     const hit = cache[name];
     if (hit && Date.now() - hit.at < CACHE_MS) return hit.rows;
-    const rows = (await listDocuments(name)).map((item) => revive(item));
+    const rows = (await listDocuments(name)).map((item: Dict) => revive(item));
     cache[name] = { at: Date.now(), rows };
     return rows;
   }
@@ -354,13 +354,13 @@ export class FirestoreStore {
     let rows = clone(await this.load(name)).map(revive);
     rows = await this.attachRelationFilters(name, rows, args.where);
     if (args.include) rows = await this.applyIncludes(name, rows, args.include);
-    rows = rows.filter((row) => matches(row, args.where));
+    rows = rows.filter((row: Dict) => matches(row, args.where));
     if (args.orderBy) rows = this.sortRows(rows, args.orderBy);
     const skip = args.skip || 0;
     const take = args.take;
     if (typeof skip === "number" && skip) rows = rows.slice(skip);
     if (typeof take === "number") rows = rows.slice(0, take);
-    if (args.select) rows = rows.map((row) => pick(row, args.select));
+    if (args.select) rows = rows.map((row: Dict) => pick(row, args.select));
     return rows;
   }
 
@@ -375,9 +375,9 @@ export class FirestoreStore {
       const related = await this.load(rel.collection);
       for (const row of rows) {
         if (rel.type === "hasMany") {
-          row[key] = related.filter((item) => item[rel.key] === row.id).map((item) => revive(clone(item)));
+          row[key] = related.filter((item: Dict) => item[rel.key] === row.id).map((item: Dict) => revive(clone(item)));
         } else {
-          const match = related.find((item) => item.id === row[rel.key]);
+          const match = related.find((item: Dict) => item.id === row[rel.key]);
           row[key] = match ? revive(clone(match)) : null;
         }
       }
@@ -432,7 +432,7 @@ export class FirestoreStore {
             continue;
           }
           const related = await this.load(map.collection);
-          next._count[countField] = related.filter((item) => item[map.key] === row.id).length;
+          next._count[countField] = related.filter((item: Dict) => item[map.key] === row.id).length;
         }
         continue;
       }

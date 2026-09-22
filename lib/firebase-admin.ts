@@ -1,5 +1,3 @@
-import { existsSync, readdirSync, readFileSync } from "fs";
-import { join } from "path";
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth, type Auth } from "firebase-admin/auth";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
@@ -23,40 +21,7 @@ function asServiceAccount(raw: Record<string, unknown> | null | undefined): Serv
   return { projectId, clientEmail, privateKey };
 }
 
-function readJsonFile(path: string) {
-  try {
-    return JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
-  } catch {
-    return null;
-  }
-}
-
-function discoverServiceAccountPath() {
-  const explicit = env("FIREBASE_SERVICE_ACCOUNT_PATH") || env("GOOGLE_APPLICATION_CREDENTIALS");
-  if (explicit && existsSync(explicit)) return explicit;
-
-  const roots = [process.cwd(), join(process.cwd(), "..")];
-  const names = ["sa.json", "serviceAccountKey.json", "service-account.json", "firebase-service-account.json", "firebase-adminsdk.json"];
-  for (const root of roots) {
-    for (const name of names) {
-      const path = join(root, name);
-      if (existsSync(path)) return path;
-    }
-    try {
-      const match = readdirSync(root).find((file) => file.includes("firebase-adminsdk") && file.endsWith(".json"));
-      if (match) return join(root, match);
-    } catch {
-      // Directory may be unreadable in some hosts.
-    }
-  }
-  return "";
-}
-
 function loadServiceAccount(): ServiceAccountInput {
-  const path = discoverServiceAccountPath();
-  const fromFile = path ? asServiceAccount(readJsonFile(path)) : null;
-  if (fromFile) return fromFile;
-
   const fromEnv = asServiceAccount({
     project_id: env("FIREBASE_PROJECT_ID") || env("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
     client_email: env("FIREBASE_CLIENT_EMAIL"),
@@ -75,7 +40,7 @@ function loadServiceAccount(): ServiceAccountInput {
   }
 
   throw new Error(
-    "Firebase Admin is not configured. Add FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY to .env (from the service account JSON), or set FIREBASE_SERVICE_ACCOUNT_PATH.",
+    "Firebase Admin is not configured. Set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY on the host.",
   );
 }
 

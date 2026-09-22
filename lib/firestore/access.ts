@@ -98,7 +98,7 @@ async function removeViaRest(name: string, id: string) {
   await rest(`/${encodeURIComponent(name)}/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
-export async function listDocuments(name: string) {
+export async function listDocuments(name: string): Promise<Dict[]> {
   if (mode === "admin") {
     try {
       const snap = await getAdminFirestore().collection(name).get();

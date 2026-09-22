@@ -26,7 +26,8 @@
     "nodemailer": "^10.0.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "zod": "^4.5.4"
+    "zod": "^4.5.4",
+    "express": "^5.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
